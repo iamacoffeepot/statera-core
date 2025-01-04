@@ -111,7 +111,6 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
         uint256 buckets = supplierBuckets[supplier];
         while (buckets != 0) {
             uint8 index = BitmathLibrary.getIndexOfLsb(buckets);
-            buckets >>= index;
 
             // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
             // which is of the same type.
@@ -120,6 +119,8 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
                 result += supplierLiquidity[supplier][terms];
             }
 
+            // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
+            buckets >>= index;
             buckets >>= 1;
         }
     }
