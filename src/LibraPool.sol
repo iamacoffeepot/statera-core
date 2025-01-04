@@ -4,6 +4,7 @@ import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 import {BitmapLibrary} from "./libraries/BitmapLibrary.sol";
 import {BitmathLibrary} from "./libraries/BitmathLibrary.sol";
+import {BucketLibrary} from "./libraries/BucketLibrary.sol";
 import {LendingTermsLibrary} from "./libraries/LendingTermsLibrary.sol";
 import {TokenTransferLibrary} from "./libraries/TokenTransferLibrary.sol";
 import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
@@ -21,6 +22,7 @@ import {
 
 contract LibraPool is PermitsReadOnlyDelegateCall {
     using BitmapLibrary for BitmapX256;
+    using BucketLibrary for Bucket;
     using LendingTermsLibrary for LendingTerms;
     using LendingTermsLibrary for LendingTermsPacked;
 
@@ -132,10 +134,12 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
     /// given lending terms (`borrowFactor` and `profitFactor`).
-    function getUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) { }
+    function getUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
+        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
+        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
-    /// @dev View is restricted to internal to prevent illegal representations of `terms`.
-    function getUnrealizedProfits(LendingTermsPacked terms) internal view returns (uint256 result) { }
+        return buckets[terms].getUnrealizedProfits(vault);
+    }
 
     /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
     /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
