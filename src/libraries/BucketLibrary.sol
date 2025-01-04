@@ -25,4 +25,12 @@ library BucketLibrary {
         // ΣU = ΣV - ΣK
         return vault.convertToAssets(bucket.shares) - bucket.totalInitialValue;
     }
+
+    /// @custom:todo
+    function getExpectedShares(
+        Bucket storage bucket,
+        uint256 supplierWeightedLiquidity
+    ) internal view returns (uint256 result) {
+        return bucket.shares * supplierWeightedLiquidity / bucket.liquidityWeighted;
+    }
 }
