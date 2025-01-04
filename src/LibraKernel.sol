@@ -10,6 +10,7 @@ import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
 
 import {
     BitmapX256,
+    Bucket,
     LendingTerms,
     LendingTermsPacked,
     KernelError,
@@ -50,14 +51,8 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
     /// @notice The total amount of liquidity borrowed from the pool.
     uint256 public totalLiquidityBorrowed;
 
-    /// @notice The amount of liquidity that has been supplied to a bucket.
-    mapping(LendingTermsPacked => uint256) public bucketLiquiditySupplied;
-
     /// @custom:todo
-    mapping(LendingTermsPacked => uint256) public bucketConviction;
-
-    /// @custom:todo
-    mapping(LendingTermsPacked => uint256) public bucketShares;
+    mapping(LendingTermsPacked => Bucket) public buckets;
 
     /// @custom:todo
     mapping(address supplier => mapping(LendingTermsPacked => uint256)) public supplierLiquidity;
@@ -178,8 +173,8 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
 
         // TODO: And this
         unchecked {
-            bucketLiquiditySupplied[terms] += liquidity;
-            bucketConviction[terms] += liquidity * getSecondsUntilAuctionStart();
+            buckets[terms].liquiditySupplied += liquidity;
+            buckets[terms].conviction += liquidity * getSecondsUntilAuctionStart();
         }
 
         supplierBuckets[recipient] |= 1 << terms.unwrap();
