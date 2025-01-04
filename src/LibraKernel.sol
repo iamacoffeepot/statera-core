@@ -11,6 +11,7 @@ import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
 import {
     BitmapX256,
     Bucket,
+    Commitment,
     LendingTerms,
     LendingTermsPacked,
     KernelError,
@@ -55,10 +56,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
     mapping(LendingTermsPacked => Bucket) public buckets;
 
     /// @custom:todo
-    mapping(address supplier => mapping(LendingTermsPacked => uint256)) public supplierLiquidity;
-
-    /// @custom:todo
-    mapping(address supplier => mapping(LendingTermsPacked => uint256)) public supplierLiquidityWeighted;
+    mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBuckets;
@@ -111,7 +109,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
             // which is of the same type.
             LendingTermsPacked terms = LendingTermsPacked.wrap(index);
             unchecked {
-                result += supplierLiquidity[supplier][terms];
+                result += commitments[supplier][terms].liquiditySupplied;
             }
 
             // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
@@ -164,11 +162,11 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
 
         totalLiquiditySupplied += liquidity;
 
-        supplierLiquidityWeighted[recipient][terms] += liquidity * getSecondsUntilAuctionStart();
+        commitments[recipient][terms].liquidityWeighted += liquidity * getSecondsUntilAuctionStart();
 
         // TODO: Specify conditions in which this is safe
         unchecked {
-            supplierLiquidity[recipient][terms] += liquidity;
+            commitments[recipient][terms].liquiditySupplied += liquidity;
         }
 
         // TODO: And this
