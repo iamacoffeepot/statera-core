@@ -125,6 +125,26 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
         }
     }
 
+    /// @notice Returns the expected number of shares of `vault` that `supplier` can expect to receive if the loans
+    /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
+    ///
+    /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
+    function getExpectedShares(
+        address supplier,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor
+    ) public view returns (uint256 result) {
+        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
+        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+        return getExpectedShares(supplier, terms);
+    }
+
+    /// @dev View is restricted to internal to prevent illegal representations of `terms`.
+    function getExpectedShares(address supplier, LendingTermsPacked terms) internal view returns (uint256 result) {
+
+    }
+
     /// @notice Supplies liquidity to this pool.
     ///
     /// Liquidity cannot be supplied if pool has expired or the auction has started.
