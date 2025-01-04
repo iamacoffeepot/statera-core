@@ -12,10 +12,9 @@ import {
     BitmapX256,
     LendingTerms,
     LendingTermsPacked,
+    LibraKernelError,
     Q4x4
 } from "./types/Types.sol";
-
-error LibraKernelError();
 
 contract LibraKernel is PermitsReadOnlyDelegateCall {
     using BitmapLibrary for BitmapX256;
