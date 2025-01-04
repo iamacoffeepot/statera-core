@@ -133,6 +133,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return getExpectedShares(supplier, terms);
     }
 
+    /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
+    /// associated with a bucket for the given lending terms default.
+    ///
     /// @dev View is restricted to internal to prevent illegal representations of `terms`.
     function getExpectedShares(address supplier, LendingTermsPacked terms) internal view returns (uint256 result) {
         result = buckets[terms].shares * commitments[supplier][terms].liquidityWeighted / buckets[terms].liquidityWeighted;
