@@ -58,7 +58,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
     mapping(address supplier => mapping(LendingTermsPacked => uint256)) public supplierLiquidity;
 
     /// @custom:todo
-    mapping(address supplier => mapping(LendingTermsPacked => uint256)) public supplierConviction;
+    mapping(address supplier => mapping(LendingTermsPacked => uint256)) public supplierLiquidityWeighted;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBuckets;
@@ -164,7 +164,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
 
         totalLiquiditySupplied += liquidity;
 
-        supplierConviction[recipient][terms] += liquidity * getSecondsUntilAuctionStart();
+        supplierLiquidityWeighted[recipient][terms] += liquidity * getSecondsUntilAuctionStart();
 
         // TODO: Specify conditions in which this is safe
         unchecked {
@@ -174,7 +174,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
         // TODO: And this
         unchecked {
             buckets[terms].liquiditySupplied += liquidity;
-            buckets[terms].conviction += liquidity * getSecondsUntilAuctionStart();
+            buckets[terms].liquidityWeighted += liquidity * getSecondsUntilAuctionStart();
         }
 
         supplierBuckets[recipient] |= 1 << terms.unwrap();
