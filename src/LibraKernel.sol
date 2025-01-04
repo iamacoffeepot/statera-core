@@ -136,7 +136,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
     function supplyLiquidity(
         Q4x4 borrowFactor,
         Q4x4 profitFactor,
-        uint128 liquidity,
+        uint256 liquidity,
         address recipient
     ) external {
         require(liquidity > 0, LibraKernelError());
