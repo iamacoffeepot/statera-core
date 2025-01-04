@@ -125,7 +125,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
         }
     }
 
-    /// @notice Returns the expected number of shares of `vault` that `supplier` can expect to receive if the loans
+    /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
     /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
     ///
     /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
