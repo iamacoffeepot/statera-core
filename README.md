@@ -6,13 +6,13 @@ Libra is a decentralized finance protocol that provides users a means to origina
 
 ## Organization
 
-### Kernel Factory
+### Pool Factory
 
 The Pool Factory is a singleton contract that specifies the liquidity pool for every tokenized vault contract. On each chain (e.g. Ethereum, Optimism, Arbitrum) there will only exist one official pool factory. The pool factory is responsible for ensuring that Pools associated with a deployment utilize the same code.
 
-### Kernel
+### Pool
 
-Kernel are instanced contracts created by the Kernel Factory that provide the logic for supplying and borrowing liquidity for a tokenized vault.
+Pools are instanced contracts created by the Pool Factory that provide the logic for supplying and borrowing liquidity for a tokenized vault.
 
 ### Solver
 
