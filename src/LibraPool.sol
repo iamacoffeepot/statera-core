@@ -19,7 +19,7 @@ import {
     Q4x4
 } from "./types/Types.sol";
 
-contract LibraKernel is PermitsReadOnlyDelegateCall {
+contract LibraPool is PermitsReadOnlyDelegateCall {
     using BitmapLibrary for BitmapX256;
     using LendingTermsLibrary for LendingTerms;
     using LendingTermsLibrary for LendingTermsPacked;
