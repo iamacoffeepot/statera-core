@@ -118,6 +118,18 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         }
     }
 
+    /// @notice Returns the amount of profits in `asset` that `supplier` can expect to receive when the pool expires.
+    ///
+    /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
+    function getExpectedProfits(
+        address supplier,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor
+    ) public view returns (uint256 result) { }
+
+    /// @dev View is restricted to internal to prevent illegal representations of `terms`.
+    function getExpectedProfits(address supplier, LendingTermsPacked terms) internal view returns (uint256 result) { }
+
     /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
     /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
     ///
