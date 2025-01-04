@@ -12,7 +12,7 @@ import {
     BitmapX256,
     LendingTerms,
     LendingTermsPacked,
-    LibraKernelError,
+    KernelError,
     KernelErrorType,
     Q4x4
 } from "./types/Types.sol";
@@ -139,13 +139,13 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
         uint256 liquidity,
         address recipient
     ) external {
-        require(liquidity > 0, LibraKernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(getSecondsUntilExpiration() > 0, LibraKernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, LibraKernelError(KernelErrorType.ILLEGAL_STATE));
+        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
         // IMPORTANT: Packing the terms will check if they are within the accepted ranges.
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, LibraKernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
         totalLiquiditySupplied += liquidity;
 

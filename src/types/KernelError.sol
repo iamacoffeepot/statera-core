@@ -1,6 +1,6 @@
 pragma solidity 0.8.27;
 
-error LibraKernelError(KernelErrorType);
+error KernelError(KernelErrorType);
 
 enum KernelErrorType {
     ILLEGAL_ARGUMENT,
