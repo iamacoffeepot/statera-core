@@ -27,7 +27,7 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
         address indexed sender,
         Q4x4 borrowFactor,
         Q4x4 profitFactor,
-        uint128 liquidity,
+        uint256 liquidity,
         address indexed recipient
     );
 
@@ -45,10 +45,10 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
     uint256 immutable public timeAuctionStarts;
 
     /// @notice The total amount of liquidity supplied to the pool.
-    uint128 public totalLiquiditySupplied;
+    uint256 public totalLiquiditySupplied;
 
     /// @notice The total amount of liquidity borrowed from the pool.
-    uint128 public totalLiquidityBorrowed;
+    uint256 public totalLiquidityBorrowed;
 
     /// @notice The amount of liquidity that has been supplied to a bucket.
     mapping(LendingTermsPacked => uint256) public bucketLiquiditySupplied;
