@@ -113,6 +113,8 @@ contract LibraKernel is PermitsReadOnlyDelegateCall {
             uint8 index = BitmathLibrary.getIndexOfLsb(buckets);
             buckets >>= index;
 
+            // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
+            // which is of the same type.
             LendingTermsPacked terms = LendingTermsPacked.wrap(index);
             unchecked {
                 result += supplierLiquidity[supplier][terms];
