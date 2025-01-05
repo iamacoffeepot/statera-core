@@ -6,7 +6,7 @@ import {
 } from "../types/Types.sol";
 
 library MathLibrary {
-    // @dev Sourced from Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
+    /// @dev Sourced from Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
     /// @custom:todo
     function mulDiv(uint256 a, uint256 b, uint256 denominator) internal pure returns (uint256 result) {
         unchecked {
