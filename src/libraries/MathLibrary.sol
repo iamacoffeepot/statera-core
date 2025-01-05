@@ -1,10 +1,5 @@
 pragma solidity 0.8.27;
 
-import {
-    KernelError,
-    KernelErrorType
-} from "../types/Types.sol";
-
 library MathLibrary {
     /// @dev Sourced from Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
     /// @custom:todo

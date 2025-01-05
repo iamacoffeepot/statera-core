@@ -1,15 +1,10 @@
 pragma solidity 0.8.27;
 
-import {
-    KernelError,
-    KernelErrorType
-} from "../types/Types.sol";
-
 /// @notice A collection of functions for performing bitwise math.
 library BitMathLibrary {
     /// @notice Returns the position of the first set bit.
     function ffs(uint256 x) internal pure returns (uint8 result) {
-        require(x > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(x > 0);
 
         unchecked {
             if ((x & 0xffffffffffffffffffffffffffffffff) == 0) {
