@@ -23,7 +23,14 @@ library BucketLibrary {
         // U_1 + U_2 + ... U_N = V_0 + V_1 + ... + V_2 - K_1 - K_2 - ... K_N
         //
         // ΣU = ΣV - ΣK
-        return vault.convertToAssets(bucket.shares) - bucket.totalInitialValue;
+        uint256 currentValue = vault.convertToAssets(bucket.shares);
+        if (bucket.totalInitialValue > currentValue) {
+            return 0;
+        }
+
+        unchecked {
+            return currentValue - bucket.totalInitialValue;
+        }
     }
 
     /// @custom:todo
