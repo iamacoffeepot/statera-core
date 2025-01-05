@@ -7,9 +7,8 @@ import {
 
 /// @notice A collection of functions for performing bitwise math.
 library BitMathLibrary {
-    /// @notice Returns the index of the least significant bit.
-    /// @custom:todo
-    function getIndexOfLsb(uint256 x) internal pure returns (uint8 result) {
+    /// @notice Returns the index of the first set bit.
+    function ffs(uint256 x) internal pure returns (uint8 result) {
         require(x > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
         unchecked {

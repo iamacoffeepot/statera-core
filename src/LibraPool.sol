@@ -109,7 +109,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function getTotalLiquiditySupplied(address supplier) public view returns (uint256 result) {
         uint256 bitmap = supplierBuckets[supplier];
         while (bitmap != 0) {
-            uint8 index = BitMathLibrary.getIndexOfLsb(bitmap);
+            uint8 index = BitMathLibrary.ffs(bitmap);
 
             // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
             // which is of the same type.
