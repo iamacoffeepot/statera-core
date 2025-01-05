@@ -3,8 +3,11 @@ pragma solidity 0.8.27;
 library MathLibrary {
     /// @dev Sourced from Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
     /// @custom:todo
-    function unsafeMulDiv(uint256 a, uint256 b, uint256 denominator) internal pure returns (uint256 result) {
+    function mulDiv(uint256 a, uint256 b, uint256 denominator) internal pure returns (uint256 result) {
         unchecked {
+            // Handle division by zero
+            require(denominator > 0);
+
             // 512-bit multiply [prod1 prod0] = a * b
             // Compute the product mod 2**256 and mod 2**256 - 1
             // then use the Chinese Remainder Theorem to reconstruct
@@ -33,6 +36,9 @@ library MathLibrary {
             ///////////////////////////////////////////////
             // 512 by 256 division.
             ///////////////////////////////////////////////
+
+            // Handle overflow, the result must be < 2**256
+            require(prod1 < denominator);
 
             // Make division exact by subtracting the remainder from [prod1 prod0]
             // Compute remainder using mulmod
