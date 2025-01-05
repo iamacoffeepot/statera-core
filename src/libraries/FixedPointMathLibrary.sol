@@ -2,7 +2,8 @@ pragma solidity 0.8.27;
 
 import {
     KernelError,
-    KernelErrorType
+    KernelErrorType,
+    Q4x4
 } from "../types/Types.sol";
 
 /// @dev Alias of `type(uint8).max` for use in inline assembly.
