@@ -7,6 +7,7 @@ import {BitMathLibrary} from "./libraries/BitMathLibrary.sol";
 import {BucketLibrary} from "./libraries/BucketLibrary.sol";
 import {FixedPointMathLibrary} from "./libraries/FixedPointMathLibrary.sol";
 import {LendingTermsLibrary} from "./libraries/LendingTermsLibrary.sol";
+import {MathLibrary} from "./libraries/MathLibrary.sol";
 import {TokenTransferLibrary} from "./libraries/TokenTransferLibrary.sol";
 import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
 
@@ -146,7 +147,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         uint256 profitsNet = profitsGross.multiplyByQ4x4(Q4X4_ONE - profitFactor);
 
-        return profitsNet * commitment.liquidityWeighted / bucket.liquidityWeighted;
+        return MathLibrary.mulDiv(profitsNet, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
 
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
@@ -175,7 +176,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         Bucket storage bucket = buckets[terms];
 
-        return bucket.shares * commitment.liquidityWeighted / bucket.liquidityWeighted;
+        return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
 
     /// @notice Supplies liquidity to this pool.
