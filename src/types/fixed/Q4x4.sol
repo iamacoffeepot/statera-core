@@ -1,5 +1,7 @@
 pragma solidity 0.8.27;
 
+import {KernelError, KernelErrorType} from "../KernelError.sol";
+
 /// @notice A binary fixed point number with 4 integer bits and 4 fraction bits.
 type Q4x4 is uint8;
 
@@ -55,8 +57,10 @@ function Q4x4IsLessThanOrEqualTo(Q4x4 x, Q4x4 y) pure returns (bool result) {
 
 /// @notice Returns `x - y`.
 function Q4x4Subtract(Q4x4 x, Q4x4 y) pure returns (Q4x4 result) {
-    // TODO: Revert if y > x
-    assembly {
-        result := sub(and(UINT8_MAXIMUM, x), and(UINT8_MAXIMUM, y))
-    }
+    uint256 u = Q4x4.unwrap(x);
+    uint256 v = Q4x4.unwrap(y);
+
+    require(v > u, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+    assembly { result := sub(u, v) }
 }
