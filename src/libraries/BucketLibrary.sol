@@ -32,12 +32,4 @@ library BucketLibrary {
             return currentValue - bucket.totalInitialValue;
         }
     }
-
-    /// @custom:todo
-    function getExpectedShares(
-        Bucket storage bucket,
-        uint256 supplierLiquidityWeighted
-    ) internal view returns (uint256 result) {
-        return bucket.shares * supplierLiquidityWeighted / bucket.liquidityWeighted;
-    }
 }

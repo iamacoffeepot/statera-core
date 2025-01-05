@@ -170,7 +170,12 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
-        return buckets[terms].getExpectedShares(commitments[supplier][terms].liquidityWeighted);
+        Commitment storage commitment = commitments[supplier][terms];
+        if (commitment.liquidityWeighted == 0) return 0;
+
+        Bucket storage bucket = buckets[terms];
+
+        return bucket.shares * commitment.liquidityWeighted / bucket.liquidityWeighted;
     }
 
     /// @notice Supplies liquidity to this pool.
