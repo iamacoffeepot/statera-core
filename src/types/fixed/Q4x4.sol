@@ -14,7 +14,8 @@ using {
     Q4x4IsGreaterThan          as >,
     Q4x4IsGreaterThanOrEqualTo as >=,
     Q4x4IsLessThan             as <,
-    Q4x4IsLessThanOrEqualTo    as <=
+    Q4x4IsLessThanOrEqualTo    as <=,
+    Q4x4Subtract               as -
 } for Q4x4 global;
 
 /// @notice Returns `true` if `x` is equal to `y`.
@@ -49,5 +50,13 @@ function Q4x4IsLessThan(Q4x4 x, Q4x4 y) pure returns (bool result) {
 function Q4x4IsLessThanOrEqualTo(Q4x4 x, Q4x4 y) pure returns (bool result) {
     assembly {
         result := iszero(gt(and(UINT8_MAXIMUM, x), and(UINT8_MAXIMUM, y)))
+    }
+}
+
+/// @notice Returns `x - y`.
+function Q4x4Subtract(Q4x4 x, Q4x4 y) pure returns (Q4x4 result) {
+    // TODO: Revert if y > x
+    assembly {
+        result := sub(and(UINT8_MAXIMUM, x), and(UINT8_MAXIMUM, y))
     }
 }
