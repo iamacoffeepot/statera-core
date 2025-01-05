@@ -109,17 +109,17 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function getTotalLiquiditySupplied(address supplier) public view returns (uint256 result) {
         uint256 bitmap = supplierBucketBitmap[supplier];
         while (bitmap != 0) {
-            uint8 index = BitMathLibrary.ffs(bitmap);
+            uint8 position = BitMathLibrary.ffs(bitmap);
 
             // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
             // which is of the same type.
-            LendingTermsPacked terms = LendingTermsPacked.wrap(index);
+            LendingTermsPacked terms = LendingTermsPacked.wrap(position);
             unchecked {
                 result += commitments[supplier][terms].liquiditySupplied;
             }
 
             // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
-            bitmap >>= index;
+            bitmap >>= position;
             bitmap >>= 1;
         }
     }

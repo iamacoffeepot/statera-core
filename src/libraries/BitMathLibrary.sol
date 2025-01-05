@@ -7,7 +7,7 @@ import {
 
 /// @notice A collection of functions for performing bitwise math.
 library BitMathLibrary {
-    /// @notice Returns the index of the first set bit.
+    /// @notice Returns the position of the first set bit.
     function ffs(uint256 x) internal pure returns (uint8 result) {
         require(x > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
