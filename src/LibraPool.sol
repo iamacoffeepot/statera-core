@@ -65,7 +65,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
-    mapping(address supplier => uint256) public supplierBuckets;
+    mapping(address supplier => uint256) public supplierBucketBitmap;
 
     constructor() { }
 
@@ -107,7 +107,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice Returns the total amount of liquidity supplied by `supplier`.
     function getTotalLiquiditySupplied(address supplier) public view returns (uint256 result) {
-        uint256 bitmap = supplierBuckets[supplier];
+        uint256 bitmap = supplierBucketBitmap[supplier];
         while (bitmap != 0) {
             uint8 index = BitMathLibrary.ffs(bitmap);
 
@@ -215,7 +215,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
             buckets[terms].liquidityWeighted += liquidity * getSecondsUntilAuctionStart();
         }
 
-        supplierBuckets[recipient] |= 1 << terms.unwrap();
+        supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
