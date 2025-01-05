@@ -29,8 +29,8 @@ library BucketLibrary {
     /// @custom:todo
     function getExpectedShares(
         Bucket storage bucket,
-        uint256 supplierWeightedLiquidity
+        uint256 supplierLiquidityWeighted
     ) internal view returns (uint256 result) {
-        return bucket.shares * supplierWeightedLiquidity / bucket.liquidityWeighted;
+        return bucket.shares * supplierLiquidityWeighted / bucket.liquidityWeighted;
     }
 }
