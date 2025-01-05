@@ -142,7 +142,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         uint256 profitsGross = bucket.totalProfitsRealized;
         if (getSecondsUntilExpiration() > 0) {
-            profitsGross += bucket.getUnrealizedProfits(vault);
+            profitsGross += getUnrealizedProfits(borrowFactor, profitFactor);
         }
 
         uint256 profitsNet = profitsGross.multiplyByQ4x4(Q4X4_ONE - profitFactor);
@@ -156,7 +156,25 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
-        return buckets[terms].getUnrealizedProfits(vault);
+        Bucket storage bucket = buckets[terms];
+
+        // This computation assumes that TokenizedVault.convertToAssets(x) is additive:
+        // f(x) + f(y) + f(z) + ... = f(x + y + z + ...)
+        //
+        // U_1 = V_1 - K_1
+        // U_2 = V_2 - K_2
+        // ...
+        // U_i = V_i - K_i
+        //
+        // U_1 + U_2 + ... U_N = V_0 + V_1 + ... + V_2 - K_1 - K_2 - ... K_N
+        //
+        // ΣU = ΣV - ΣK
+        uint256 currentValue = vault.convertToAssets(bucket.shares);
+        if (bucket.totalInitialValue > currentValue) return 0;
+
+        unchecked {
+            return currentValue - bucket.totalInitialValue;
+        }
     }
 
     /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
