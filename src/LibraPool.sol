@@ -3,7 +3,7 @@ pragma solidity 0.8.27;
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 import {BitmapLibrary} from "./libraries/BitmapLibrary.sol";
-import {BitmathLibrary} from "./libraries/BitmathLibrary.sol";
+import {BitMathLibrary} from "./libraries/BitMathLibrary.sol";
 import {BucketLibrary} from "./libraries/BucketLibrary.sol";
 import {LendingTermsLibrary} from "./libraries/LendingTermsLibrary.sol";
 import {TokenTransferLibrary} from "./libraries/TokenTransferLibrary.sol";
@@ -105,7 +105,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function getTotalLiquiditySupplied(address supplier) public view returns (uint256 result) {
         uint256 buckets = supplierBuckets[supplier];
         while (buckets != 0) {
-            uint8 index = BitmathLibrary.getIndexOfLsb(buckets);
+            uint8 index = BitMathLibrary.getIndexOfLsb(buckets);
 
             // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
             // which is of the same type.
