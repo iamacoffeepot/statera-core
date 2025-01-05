@@ -147,7 +147,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         uint256 profitsNet = profitsGross.multiplyByQ4x4(Q4X4_ONE - profitFactor);
 
-        return MathLibrary.mulDiv(profitsNet, commitment.liquidityWeighted, bucket.liquidityWeighted);
+        return MathLibrary.unsafeMulDiv(profitsNet, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
 
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
@@ -176,7 +176,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         Bucket storage bucket = buckets[terms];
 
-        return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
+        return MathLibrary.unsafeMulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
 
     /// @notice Supplies liquidity to this pool.
