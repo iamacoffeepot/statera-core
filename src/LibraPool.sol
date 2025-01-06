@@ -39,10 +39,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         address indexed recipient
     );
 
-    /// @notice TODO
+    /// @notice The vault whose shares are accepted as collateral.
     TokenizedVault immutable public vault;
 
-    /// @notice TODO
+    /// @notice The underlying token that `vault` uses for accounting, depositing, and withdrawing.
     Token immutable public asset;
 
     /// @notice The time at which this pool expires.
