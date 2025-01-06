@@ -144,8 +144,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Returns the amount of profits in `asset` that `supplier` should expect to receive when the pool expires.
-    ///
-    /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
+    /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
     function getSupplierProfits(
         address supplier,
         Q4x4 borrowFactor,
@@ -170,8 +169,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice Returns the number of shares of `vault` that `supplier` should expect to receive if the loans
     /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
-    ///
-    /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
+    /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
     function getSupplierShares(
         address supplier,
         Q4x4 borrowFactor,
@@ -213,9 +211,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Supplies liquidity to this pool.
-    ///
-    /// Liquidity cannot be supplied if pool has expired or the auction has started.
-    ///
+    /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
     /// @param borrowFactor TODO
     /// @param profitFactor TODO
     /// @param liquidity The amount of liquidity to supply.
