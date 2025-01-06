@@ -105,25 +105,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return getSecondsUntilAuctionStart(block.timestamp);
     }
 
-    /// @notice Returns the total amount of liquidity supplied by `supplier`.
-    function getTotalLiquiditySupplied(address supplier) public view returns (uint256 result) {
-        uint256 bitmap = supplierBucketBitmap[supplier];
-        while (bitmap != 0) {
-            uint8 position = BitMathLibrary.ffs(bitmap);
-
-            // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
-            // which is of the same type.
-            LendingTermsPacked terms = LendingTermsPacked.wrap(position);
-            unchecked {
-                result += commitments[supplier][terms].liquiditySupplied;
-            }
-
-            // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
-            bitmap >>= position;
-            bitmap >>= 1;
-        }
-    }
-
     /// @custom:todo
     function getBucket(
         Q4x4 borrowFactor,
@@ -141,6 +122,33 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         return (terms, buckets[terms]);
+    }
+
+    /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
+    /// given lending terms (`borrowFactor` and `profitFactor`).
+    function getBucketUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
+        (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
+
+        // All recorded profits are final when the pool expires.
+        if (getSecondsUntilExpiration() == 0) return 0;
+
+        // This computation assumes that TokenizedVault.convertToAssets(x) is additive:
+        // f(x) + f(y) + f(z) + ... = f(x + y + z + ...)
+        //
+        // U_1 = V_1 - K_1
+        // U_2 = V_2 - K_2
+        // ...
+        // U_i = V_i - K_i
+        //
+        // U_1 + U_2 + ... U_N = V_0 + V_1 + ... + V_2 - K_1 - K_2 - ... K_N
+        //
+        // ΣU = ΣV - ΣK
+        uint256 currentValue = vault.convertToAssets(bucket.shares);
+        if (bucket.totalInitialValue > currentValue) return 0;
+
+        unchecked {
+            return currentValue - bucket.totalInitialValue;
+        }
     }
 
     /// @notice Returns the amount of profits in `asset` that `supplier` should expect to receive when the pool expires.
@@ -182,31 +190,23 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
+    
+    /// @notice Returns the total amount of liquidity supplied by `supplier`.
+    function getTotalLiquiditySupplied(address supplier) public view returns (uint256 result) {
+        uint256 bitmap = supplierBucketBitmap[supplier];
+        while (bitmap != 0) {
+            uint8 position = BitMathLibrary.ffs(bitmap);
 
-    /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
-    /// given lending terms (`borrowFactor` and `profitFactor`).
-    function getBucketUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
-        (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
+            // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
+            // which is of the same type.
+            LendingTermsPacked terms = LendingTermsPacked.wrap(position);
+            unchecked {
+                result += commitments[supplier][terms].liquiditySupplied;
+            }
 
-        // All recorded profits are final when the pool expires.
-        if (getSecondsUntilExpiration() == 0) return 0;
-
-        // This computation assumes that TokenizedVault.convertToAssets(x) is additive:
-        // f(x) + f(y) + f(z) + ... = f(x + y + z + ...)
-        //
-        // U_1 = V_1 - K_1
-        // U_2 = V_2 - K_2
-        // ...
-        // U_i = V_i - K_i
-        //
-        // U_1 + U_2 + ... U_N = V_0 + V_1 + ... + V_2 - K_1 - K_2 - ... K_N
-        //
-        // ΣU = ΣV - ΣK
-        uint256 currentValue = vault.convertToAssets(bucket.shares);
-        if (bucket.totalInitialValue > currentValue) return 0;
-
-        unchecked {
-            return currentValue - bucket.totalInitialValue;
+            // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
+            bitmap >>= position;
+            bitmap >>= 1;
         }
     }
 
