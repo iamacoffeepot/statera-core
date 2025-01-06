@@ -1,5 +1,6 @@
 pragma solidity 0.8.27;
 
+import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 import {BitmapLibrary} from "./libraries/BitmapLibrary.sol";
@@ -9,7 +10,6 @@ import {FixedPointMathLibrary} from "./libraries/FixedPointMathLibrary.sol";
 import {LendingTermsLibrary} from "./libraries/LendingTermsLibrary.sol";
 import {MathLibrary} from "./libraries/MathLibrary.sol";
 import {TokenTransferLibrary} from "./libraries/TokenTransferLibrary.sol";
-import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
 
 import {
     BitmapX256,
