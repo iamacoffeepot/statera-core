@@ -229,19 +229,19 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
+        Commitment memory commit = commitments[recipient][terms];
+
         totalLiquiditySupplied += liquidity;
-
-        commitments[recipient][terms].liquidityWeighted += liquidity * getSecondsUntilAuctionStart();
-
-        // TODO: Specify conditions in which this is safe
-        unchecked {
-            commitments[recipient][terms].liquiditySupplied += liquidity;
-        }
-
-        // TODO: And this
         unchecked {
             bucket.liquiditySupplied += liquidity;
-            bucket.liquidityWeighted += liquidity * getSecondsUntilAuctionStart();
+            commit.liquiditySupplied += liquidity;
+        }
+
+        uint256 liquidityWeighted = liquidity * getSecondsUntilAuctionStart();
+
+        bucket.liquidityWeighted += liquidityWeighted;
+        unchecked {
+            commit.liquidityWeighted += liquidityWeighted;
         }
 
         supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
