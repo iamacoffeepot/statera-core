@@ -161,8 +161,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     ) public view returns (uint256 result) {
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
-        Commitment storage commitment = commitments[supplier][terms];
-        if (commitment.liquidityWeighted == 0) return 0;
+        Commitment storage commit = commitments[supplier][terms];
+        if (commit.liquidityWeighted == 0) return 0;
 
         uint256 supplierProfitsUnrealized = FixedPointMathLibrary.multiplyByQ4x4(
             getBucketUnrealizedProfits(borrowFactor, profitFactor),
@@ -171,7 +171,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         return MathLibrary.mulDiv(
             supplierProfitsUnrealized + bucket.supplierProfitsRealized,
-            commitment.liquidityWeighted,
+            commit.liquidityWeighted,
             bucket.liquidityWeighted
         );
     }
@@ -186,10 +186,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     ) public view returns (uint256 result) {
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
-        Commitment storage commitment = commitments[supplier][terms];
-        if (commitment.liquidityWeighted == 0) return 0;
+        Commitment storage commit = commitments[supplier][terms];
+        if (commit.liquidityWeighted == 0) return 0;
 
-        return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
+        return MathLibrary.mulDiv(bucket.shares, commit.liquidityWeighted, bucket.liquidityWeighted);
     }
 
     /// @notice Returns the total amount of liquidity supplied by `supplier`.
