@@ -176,8 +176,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         );
     }
 
-    /// @notice Returns the number of shares of `vault` that `supplier` should expect to receive if the loans
-    /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
+    /// @notice Returns the number of shares of `vault` that `supplier` should expect to receive from the loans
+    /// associated for a bucket with the given lending terms (`borrowFactor` and `profitFactor`) default.
     /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
     function getSupplierShares(
         address supplier,
