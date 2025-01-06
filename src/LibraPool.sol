@@ -131,7 +131,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     ) internal view returns (LendingTermsPacked terms, Bucket storage bucket) {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        return (terms, bucket);
+        return (terms, buckets[terms]);
     }
 
     /// @notice Returns the amount of profits in `asset` that `supplier` can expect to receive when the pool expires.
