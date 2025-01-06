@@ -127,7 +127,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Returns the amount of profits in `asset` that `supplier` can expect to receive when the pool expires.
     ///
     /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
-    function getExpectedProfits(
+    function getSupplierProfits(
         address supplier,
         Q4x4 borrowFactor,
         Q4x4 profitFactor
