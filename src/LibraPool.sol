@@ -159,6 +159,23 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         );
     }
 
+    /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
+    /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
+    ///
+    /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
+    function getSupplierShares(
+        address supplier,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor
+    ) public view returns (uint256 result) {
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketFor(borrowFactor, profitFactor);
+
+        Commitment storage commitment = commitments[supplier][terms];
+        if (commitment.liquidityWeighted == 0) return 0;
+
+        return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
+    }
+
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
     /// given lending terms (`borrowFactor` and `profitFactor`).
     function getUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
@@ -184,23 +201,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         unchecked {
             return currentValue - bucket.totalInitialValue;
         }
-    }
-
-    /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
-    /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
-    ///
-    /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
-    function getExpectedShares(
-        address supplier,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
-    ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketFor(borrowFactor, profitFactor);
-
-        Commitment storage commitment = commitments[supplier][terms];
-        if (commitment.liquidityWeighted == 0) return 0;
-
-        return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
 
     /// @notice Supplies liquidity to this pool.
