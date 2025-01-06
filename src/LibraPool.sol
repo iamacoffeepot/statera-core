@@ -226,8 +226,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
         require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
-        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
         totalLiquiditySupplied += liquidity;
 
@@ -240,8 +239,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         // TODO: And this
         unchecked {
-            buckets[terms].liquiditySupplied += liquidity;
-            buckets[terms].liquidityWeighted += liquidity * getSecondsUntilAuctionStart();
+            bucket.liquiditySupplied += liquidity;
+            bucket.liquidityWeighted += liquidity * getSecondsUntilAuctionStart();
         }
 
         supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
