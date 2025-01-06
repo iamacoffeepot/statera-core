@@ -134,7 +134,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return (terms, buckets[terms]);
     }
 
-    /// @notice Returns the amount of profits in `asset` that `supplier` can expect to receive when the pool expires.
+    /// @notice Returns the amount of profits in `asset` that `supplier` should expect to receive when the pool expires.
     ///
     /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
     function getSupplierProfits(
@@ -159,7 +159,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         );
     }
 
-    /// @notice Returns the number of shares of `vault` that `supplier` can expect to receive if the loans
+    /// @notice Returns the number of shares of `vault` that `supplier` should expect to receive if the loans
     /// associated with a bucket for the given lending terms (`borrowFactor` and `profitFactor`) default.
     ///
     /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
