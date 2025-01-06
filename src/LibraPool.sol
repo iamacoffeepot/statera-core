@@ -148,7 +148,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         if (commitment.liquidityWeighted == 0) return 0;
 
         uint256 supplierProfitsUnrealized = FixedPointMathLibrary.multiplyByQ4x4(
-            getUnrealizedProfits(borrowFactor, profitFactor),
+            getBucketUnrealizedProfits(borrowFactor, profitFactor),
             Q4X4_ONE - profitFactor
         );
 
@@ -178,7 +178,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
     /// given lending terms (`borrowFactor` and `profitFactor`).
-    function getUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
+    function getBucketUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
         (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketFor(borrowFactor, profitFactor);
 
         // All recorded profits are final when the pool expires.
