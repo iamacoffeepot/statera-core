@@ -140,14 +140,16 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         Bucket storage bucket = buckets[terms];
 
-        uint256 profitsGross = bucket.totalProfitsRealized;
-        if (getSecondsUntilExpiration() > 0) {
-            profitsGross += getUnrealizedProfits(borrowFactor, profitFactor);
-        }
+        uint256 supplierProfitsUnrealized = FixedPointMathLibrary.multiplyByQ4x4(
+            getUnrealizedProfits(borrowFactor, profitFactor),
+            Q4X4_ONE - profitFactor
+        );
 
-        uint256 profitsNet = profitsGross.multiplyByQ4x4(Q4X4_ONE - profitFactor);
-
-        return MathLibrary.mulDiv(profitsNet, commitment.liquidityWeighted, bucket.liquidityWeighted);
+        return MathLibrary.mulDiv(
+            bucket.totalProfitsRealized + supplierProfitsUnrealized,
+            commitment.liquidityWeighted,
+            bucket.liquidityWeighted
+        );
     }
 
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
@@ -155,6 +157,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function getUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+        // All recorded profits are final when the pool expires.
+        if (getSecondsUntilExpiration() == 0) return 0;
 
         Bucket storage bucket = buckets[terms];
 
