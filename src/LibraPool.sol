@@ -124,6 +124,16 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         }
     }
 
+    /// @custom:todo
+    function getBucketFor(
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor
+    ) internal view returns (LendingTermsPacked terms, Bucket storage bucket) {
+        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
+        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        return (terms, bucket);
+    }
+
     /// @notice Returns the amount of profits in `asset` that `supplier` can expect to receive when the pool expires.
     ///
     /// This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
@@ -132,13 +142,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         Q4x4 borrowFactor,
         Q4x4 profitFactor
     ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketFor(borrowFactor, profitFactor);
 
         Commitment storage commitment = commitments[supplier][terms];
         if (commitment.liquidityWeighted == 0) return 0;
-
-        Bucket storage bucket = buckets[terms];
 
         uint256 supplierProfitsUnrealized = FixedPointMathLibrary.multiplyByQ4x4(
             getUnrealizedProfits(borrowFactor, profitFactor),
@@ -146,7 +153,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         );
 
         return MathLibrary.mulDiv(
-            supplierProfitsFinalized + bucket.supplierProfitsRealized,
+            supplierProfitsUnrealized + bucket.supplierProfitsRealized,
             commitment.liquidityWeighted,
             bucket.liquidityWeighted
         );
@@ -155,13 +162,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
     /// given lending terms (`borrowFactor` and `profitFactor`).
     function getUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
-        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketFor(borrowFactor, profitFactor);
 
         // All recorded profits are final when the pool expires.
         if (getSecondsUntilExpiration() == 0) return 0;
-
-        Bucket storage bucket = buckets[terms];
 
         // This computation assumes that TokenizedVault.convertToAssets(x) is additive:
         // f(x) + f(y) + f(z) + ... = f(x + y + z + ...)
@@ -191,13 +195,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         Q4x4 borrowFactor,
         Q4x4 profitFactor
     ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketFor(borrowFactor, profitFactor);
 
         Commitment storage commitment = commitments[supplier][terms];
         if (commitment.liquidityWeighted == 0) return 0;
-
-        Bucket storage bucket = buckets[terms];
 
         return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
