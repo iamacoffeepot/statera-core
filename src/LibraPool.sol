@@ -190,9 +190,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         return MathLibrary.mulDiv(bucket.shares, commitment.liquidityWeighted, bucket.liquidityWeighted);
     }
-    
+
     /// @notice Returns the total amount of liquidity supplied by `supplier`.
-    function getTotalLiquiditySupplied(address supplier) public view returns (uint256 result) {
+    function getSupplierTotalLiquidity(address supplier) public view returns (uint256 result) {
         uint256 bitmap = supplierBucketBitmap[supplier];
         while (bitmap != 0) {
             uint8 position = BitMathLibrary.ffs(bitmap);
