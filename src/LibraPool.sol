@@ -146,7 +146,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         );
 
         return MathLibrary.mulDiv(
-            bucket.totalProfitsRealized + supplierProfitsUnrealized,
+            supplierProfitsFinalized + bucket.supplierProfitsRealized,
             commitment.liquidityWeighted,
             bucket.liquidityWeighted
         );

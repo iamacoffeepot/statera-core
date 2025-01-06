@@ -4,6 +4,6 @@ struct Bucket {
     uint256 liquiditySupplied;
     uint256 liquidityWeighted;
     uint256 totalInitialValue;
-    uint256 totalProfitsRealized;
+    uint256 supplierProfitsRealized;
     uint256 shares;
 }
