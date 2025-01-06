@@ -125,16 +125,16 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @custom:todo
-    function getBucketFor(
+    function getBucket(
         Q4x4 borrowFactor,
         Q4x4 profitFactor
     ) public view returns (LendingTermsPacked terms, Bucket memory bucket) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointerFor(borrowFactor, profitFactor);
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
         return (terms, bucket);
     }
 
     /// @custom:todo
-    function getBucketPointerFor(
+    function getBucketPointer(
         Q4x4 borrowFactor,
         Q4x4 profitFactor
     ) internal view returns (LendingTermsPacked terms, Bucket storage bucket) {
@@ -150,7 +150,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         Q4x4 borrowFactor,
         Q4x4 profitFactor
     ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointerFor(borrowFactor, profitFactor);
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
         Commitment storage commitment = commitments[supplier][terms];
         if (commitment.liquidityWeighted == 0) return 0;
@@ -175,7 +175,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         Q4x4 borrowFactor,
         Q4x4 profitFactor
     ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointerFor(borrowFactor, profitFactor);
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
         Commitment storage commitment = commitments[supplier][terms];
         if (commitment.liquidityWeighted == 0) return 0;
@@ -186,7 +186,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
     /// given lending terms (`borrowFactor` and `profitFactor`).
     function getBucketUnrealizedProfits(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
-        (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketPointerFor(borrowFactor, profitFactor);
+        (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
         // All recorded profits are final when the pool expires.
         if (getSecondsUntilExpiration() == 0) return 0;
