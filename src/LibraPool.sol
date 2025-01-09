@@ -251,4 +251,13 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
+
+    /// @custom:todo
+    function borrowLiquidity(
+        LendingTerms[] calldata sources,
+        Q4x4 minimumBorrowFactor,
+        Q4x4 minimumProfitFactor,
+        uint256 liquidity,
+        uint256 shares
+    ) external { }
 }
