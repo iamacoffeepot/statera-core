@@ -266,5 +266,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         Q4x4 minimumProfitFactor,
         uint256 liquidity,
         uint256 shares
-    ) external { }
+    ) external {
+        require(sources.length > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+    }
 }
