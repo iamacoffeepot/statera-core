@@ -214,7 +214,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
     /// @param borrowFactor TODO
-    /// @param profitFactor TODO
+    /// @param profitFactor The proportion of profits that will be allocated to the borrower.
     /// @param liquidity The amount of liquidity to supply.
     /// @param recipient The address to supply liquidity to.
     function supplyLiquidity(
