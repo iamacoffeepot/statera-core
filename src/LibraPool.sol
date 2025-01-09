@@ -214,6 +214,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
     /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// @dev Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// @dev Reverts with an `ILLEGAL_STATE` error if the auction has started.
     /// @param borrowFactor TODO
     /// @param profitFactor The proportion of profits that will be allocated to the borrower.
     /// @param liquidity The amount of liquidity to supply.
