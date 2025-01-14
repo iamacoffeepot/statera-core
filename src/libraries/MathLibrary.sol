@@ -1,6 +1,16 @@
 pragma solidity 0.8.27;
 
 library MathLibrary {
+    /// @custom:todo
+    function max(uint256 a, uint256 b) internal pure returns (uint256 result) {
+        return a > b ? a : b;
+    }
+
+    /// @custom:todo
+    function min(uint256 a, uint256 b) internal pure returns (uint256 result) {
+        return a < b ? a : b;
+    }
+
     /// @dev Sourced from Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
     /// @custom:todo
     function mulDiv(uint256 a, uint256 b, uint256 denominator) internal pure returns (uint256 result) {
