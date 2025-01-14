@@ -262,8 +262,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @custom:todo
     function borrowLiquidity(
         LendingTerms[] calldata sources,
-        Q4x4 minimumBorrowFactor,
-        Q4x4 minimumProfitFactor,
         uint256 liquidity,
         uint256 shares
     ) external {
