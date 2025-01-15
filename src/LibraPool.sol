@@ -160,7 +160,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice Returns the amount of liquidity that is available to be borrowed from a bucket associated with
     /// the given lending terms (`borrowFactor` and `profitFactor`).
-    function getBuketAvailableLiquidity(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
+    function getBucketAvailableLiquidity(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
         (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
         return bucket.liquiditySupplied - bucket.liquidityBorrowed;
     }
