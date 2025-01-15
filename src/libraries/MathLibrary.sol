@@ -1,12 +1,12 @@
 pragma solidity 0.8.27;
 
 library MathLibrary {
-    /// @custom:todo
+    /// @notice Returns `a` if `a > b`, otherwise returns `b`.
     function max(uint256 a, uint256 b) internal pure returns (uint256 result) {
         return a > b ? a : b;
     }
 
-    /// @custom:todo
+    /// @notice Returns `a` if `a < b`, otherwise returns `b`.
     function min(uint256 a, uint256 b) internal pure returns (uint256 result) {
         return a < b ? a : b;
     }
