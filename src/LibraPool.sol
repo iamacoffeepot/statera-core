@@ -17,6 +17,7 @@ import {
     Commitment,
     LendingTerms,
     LendingTermsPacked,
+    Loan,
     KernelError,
     KernelErrorType,
     Q4x4,
@@ -59,10 +60,16 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     uint256 public totalLiquidityBorrowed;
 
     /// @custom:todo
+    uint256 public totalLoans;
+
+    /// @custom:todo
     mapping(LendingTermsPacked => Bucket) public buckets;
 
     /// @custom:todo
     mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
+
+    /// @custom:todo
+    mapping(uint256 id => Loan) public loans;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
@@ -264,9 +271,65 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         LendingTerms[] calldata sources,
         uint256 liquidity,
         uint256 shares
-    ) external {
-        require(sources.length > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+    ) external returns (uint256 loanId) {
+        require(sources.length > 0 && sources.length < 5, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+        Loan memory loan;
+
+        loan.borrowFactor       = LendingTermsLibrary.BORROW_FACTOR_MAXIMUM;
+        loan.liquidityBorrowed  = liquidity;
+        loan.sharesValueInitial = vault.convertToAssets(shares);
+        loan.sharesSupplied     = shares;
+
+        uint256 liquidityRemaining = liquidity;
+        uint256 i = 0;
+
+        while (i < sources.length && liquidityRemaining > 0) {
+            LendingTerms calldata source = sources[i];
+
+            (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(source);
+            require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+            Bucket storage bucket = buckets[terms];
+
+            uint256 liquidityAvailable;
+            unchecked {
+                liquidityAvailable = bucket.liquiditySupplied - bucket.liquidityBorrowed;
+            }
+
+            if (liquidityAvailable == 0) {
+                continue;
+            }
+
+            uint256 liquidityBorrowed = MathLibrary.min(liquidityAvailable, liquidityRemaining);
+            unchecked {
+                bucket.liquidityBorrowed += liquidityBorrowed;
+            }
+
+            loan.amounts[i] = liquidityBorrowed;
+            loan.sources[i] = terms;
+
+            if (source.borrowFactor < loan.borrowFactor) {
+                loan.borrowFactor = source.borrowFactor;
+            }
+
+            unchecked {
+                liquidityRemaining -= liquidityBorrowed;
+                i++;
+            }
+        }
+
+        require(liquidityRemaining == 0, KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY));
+
+        uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValueInitial, loan.borrowFactor);
+        require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
+
+        loans[totalLoans] = loan;
+
+        unchecked {
+            totalLoans += 1;
+        }
     }
 }

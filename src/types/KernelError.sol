@@ -5,6 +5,7 @@ error KernelError(KernelErrorType);
 enum KernelErrorType {
     ILLEGAL_ARGUMENT,
     ILLEGAL_STATE,
+    INSUFFICIENT_COLLATERAL,
     INSUFFICIENT_LIQUIDITY,
     UNREACHABLE
 }
