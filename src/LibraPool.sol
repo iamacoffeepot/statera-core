@@ -327,8 +327,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         loan.borrowFactor       = LendingTermsLibrary.BORROW_FACTOR_MAXIMUM;
         loan.liquidityBorrowed  = liquidity;
-        loan.sharesValueInitial = vault.convertToAssets(shares);
         loan.sharesSupplied     = shares;
+        loan.sharesValueInitial = vault.convertToAssets(shares);
 
         uint256 liquidityRemaining = liquidity;
         uint256 i = 0;
