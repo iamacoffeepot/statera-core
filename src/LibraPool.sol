@@ -166,6 +166,27 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return bucket.liquiditySupplied - bucket.liquidityBorrowed;
     }
 
+    /// @notice Returns the amount of liquidity that `supplier`should expect to receive back from a bucket
+    /// associated with the given lending terms (`borrowFactor` and `profitFactor`).
+    /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
+    function getSupplierLiquidity(
+        address supplier,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor
+    ) public view returns (uint256 result) {
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
+
+        Commitment storage commit = commitments[supplier][terms];
+        if (commit.liquidityWeighted == 0) return 0;
+
+        uint256 liquidityAvailable;
+        unchecked {
+            liquidityAvailable = bucket.liquiditySupplied - bucket.liquidityBorrowed;
+        }
+
+        return MathLibrary.mulDiv(liquidityAvailable, commit.liquiditySupplied, bucket.liquiditySupplied);
+    }
+
     /// @notice Returns the amount of profits in `asset` that `supplier` should expect to receive from a bucket
     /// associated with the given lending terms (`borrowFactor` and `profitFactor`).
     /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
