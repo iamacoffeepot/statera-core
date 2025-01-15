@@ -266,7 +266,19 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
 
-    /// @custom:todo
+    /// @notice Borrows liquidity from this pool.
+    /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero or greater than 4.
+    /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// @dev Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// @dev Reverts with an `ILLEGAL_STATE` error if the auction has started.
+    /// @dev Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
+    /// to fulfill the request.
+    /// @dev Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to secure the loan.
+    /// @param sources TODO
+    /// @param liquidity The amount of liquidity to borrow.
+    /// @param shares The amount of shares to supply as collateral.
+    /// @return loanId The identifier of the created loan.
     function borrowLiquidity(
         LendingTerms[] calldata sources,
         uint256 liquidity,
