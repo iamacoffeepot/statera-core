@@ -326,7 +326,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValueInitial, loan.borrowFactor);
         require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
 
-        loans[totalLoans] = loan;
+        loans[loanId = totalLoans] = loan;
 
         unchecked {
             totalLoans += 1;
