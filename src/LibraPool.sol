@@ -121,7 +121,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return (terms, bucket);
     }
 
-    /// @custom:todo
+    /// @notice Returns a storage pointer to the bucket associated with the given lending terms
+    /// (`borrowFactor` and `profitFactor`).
     function getBucketPointer(
         Q4x4 borrowFactor,
         Q4x4 profitFactor
