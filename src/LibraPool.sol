@@ -151,11 +151,11 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         // U_1 + U_2 + ... U_N = V_0 + V_1 + ... + V_2 - K_1 - K_2 - ... K_N
         //
         // ΣU = ΣV - ΣK
-        uint256 currentValue = vault.convertToAssets(bucket.shares);
-        if (bucket.totalInitialValue > currentValue) return 0;
+        uint256 currentValue = vault.convertToAssets(bucket.sharesSupplied);
+        if (bucket.sharesValueInitial > currentValue) return 0;
 
         unchecked {
-            return currentValue - bucket.totalInitialValue;
+            return currentValue - bucket.sharesValueInitial;
         }
     }
 
@@ -204,7 +204,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         Commitment storage commit = commitments[supplier][terms];
         if (commit.liquidityWeighted == 0) return 0;
 
-        return MathLibrary.mulDiv(bucket.shares, commit.liquidityWeighted, bucket.liquidityWeighted);
+        return MathLibrary.mulDiv(bucket.sharesSupplied, commit.liquidityWeighted, bucket.liquidityWeighted);
     }
 
     /// @notice Returns the total amount of liquidity supplied by `supplier`.
