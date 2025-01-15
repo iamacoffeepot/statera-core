@@ -227,9 +227,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
-    /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
-    /// @dev Reverts with an `ILLEGAL_STATE` error if the pool has expired.
-    /// @dev Reverts with an `ILLEGAL_STATE` error if the auction has started.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
     /// @param borrowFactor TODO
     /// @param profitFactor The proportion of profits that will be allocated to the borrower.
     /// @param liquidity The amount of liquidity to supply.
@@ -267,14 +268,15 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Borrows liquidity from this pool.
-    /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero or greater than 4.
-    /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
-    /// @dev Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
-    /// @dev Reverts with an `ILLEGAL_STATE` error if the pool has expired.
-    /// @dev Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// @dev Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero or greater than 4.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
+    /// - Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
     /// to fulfill the request.
-    /// @dev Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to secure the loan.
+    /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to secure the loan.
     /// @param sources TODO
     /// @param liquidity The amount of liquidity to borrow.
     /// @param shares The amount of shares to supply as collateral.
