@@ -276,7 +276,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
     /// - Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
     /// to fulfill the request.
-    /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to secure the loan.
+    /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to collateralize
+    /// the loan.
     /// @param sources TODO
     /// @param liquidity The amount of liquidity to borrow.
     /// @param shares The amount of shares to supply as collateral.
