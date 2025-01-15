@@ -165,8 +165,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return bucket.liquiditySupplied - bucket.liquidityBorrowed;
     }
 
-    /// @notice Returns the amount of profits in `asset` that `supplier` should expect to receive from a bucket with
-    /// the given lending terms (`borrowFactor` and `profitFactor`).
+    /// @notice Returns the amount of profits in `asset` that `supplier` should expect to receive from a bucket
+    /// associated with the given lending terms (`borrowFactor` and `profitFactor`).
     /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
     function getSupplierProfits(
         address supplier,
