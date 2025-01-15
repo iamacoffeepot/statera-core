@@ -268,6 +268,13 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
 
+    /// @notice Withdraws liquidity from this pool.
+    function withdrawLiquidity(
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor,
+        uint256 liquidity
+    ) external { }
+
     /// @notice Borrows liquidity from this pool.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero or greater than 4.
