@@ -276,6 +276,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
+        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+
         Loan memory loan;
 
         loan.borrowFactor       = LendingTermsLibrary.BORROW_FACTOR_MAXIMUM;
