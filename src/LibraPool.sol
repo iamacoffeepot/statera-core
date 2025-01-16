@@ -250,7 +250,13 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Borrows liquidity from this pool.
     /// @param sources TODO
     /// @param liquidity The amount of liquidity to borrow.
-    function borrowLiquidity(LendingTerms[] calldata sources, uint256 liquidity) external { }
+    function borrowLiquidity(LendingTerms[] calldata sources, uint256 liquidity) external {
+        require(sources.length > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+    }
 
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
