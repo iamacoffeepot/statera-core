@@ -285,4 +285,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
+
+    /// @notice Supplies collateral to this pool.
+    /// @param shares The amount of shares to supply.
+    /// @param recipient The address to supply collateral to.
+    function supplyCollateral(uint256 shares, address recipient) external { }
 }
