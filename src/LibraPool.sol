@@ -248,6 +248,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Borrows liquidity from this pool.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
     /// @param sources TODO
     /// @param liquidity The amount of liquidity to borrow.
     function borrowLiquidity(LendingTerms[] calldata sources, uint256 liquidity) external {
