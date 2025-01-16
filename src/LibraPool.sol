@@ -379,4 +379,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
             totalLoans += 1;
         }
     }
+
+    /// @notice Repays borrowed liquidity to this pool.
+    function repayLiquidity(uint256 loanId) external { }
 }
