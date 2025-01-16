@@ -244,6 +244,11 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         }
     }
 
+    /// @notice Borrows liquidity from this pool.
+    /// @param sources TODO
+    /// @param liquidity The amount of liquidity to borrow.
+    function borrowLiquidity(LendingTerms[] calldata sources, uint256 liquidity) external { }
+
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
     /// @notice
