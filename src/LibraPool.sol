@@ -19,6 +19,7 @@ import {
     LendingTermsPacked,
     KernelError,
     KernelErrorType,
+    Position,
     Q4x4,
     Q4X4_ONE
 } from "./types/Types.sol";
@@ -63,6 +64,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @custom:todo
     mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
+
+    /// @custom:todo
+    mapping(address borrower => Position) public positions;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
