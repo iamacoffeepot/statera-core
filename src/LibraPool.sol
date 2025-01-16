@@ -59,6 +59,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice The total amount of liquidity borrowed from the pool.
     uint256 public totalLiquidityBorrowed;
 
+    /// @notice The total amount of shares supplied as collateral to the pool.
+    uint256 public totalSharesSupplied;
+
     /// @custom:todo
     mapping(LendingTermsPacked => Bucket) public buckets;
 
@@ -294,5 +297,16 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Supplies collateral to this pool.
     /// @param shares The amount of shares to supply.
     /// @param recipient The address to supply collateral to.
-    function supplyCollateral(uint256 shares, address recipient) external { }
+    function supplyCollateral(uint256 shares, address recipient) external {
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+
+        Position storage position = positions[recipient];
+
+        totalSharesSupplied += shares;
+        unchecked {
+            position.sharesSupplied += shares;
+        }
+    }
 }
