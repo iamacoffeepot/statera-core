@@ -17,7 +17,6 @@ import {
     Commitment,
     LendingTerms,
     LendingTermsPacked,
-    Loan,
     KernelError,
     KernelErrorType,
     Q4x4,
@@ -60,16 +59,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     uint256 public totalLiquidityBorrowed;
 
     /// @custom:todo
-    uint256 public totalLoans;
-
-    /// @custom:todo
     mapping(LendingTermsPacked => Bucket) public buckets;
 
     /// @custom:todo
     mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
-
-    /// @custom:todo
-    mapping(uint256 id => Loan) public loans;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
@@ -288,98 +281,4 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
-
-    /// @notice Withdraws liquidity from this pool.
-    function withdrawLiquidity(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
-        uint256 liquidity
-    ) external { }
-
-    /// @notice Borrows liquidity from this pool.
-    /// @notice
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero or greater than 4.
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
-    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
-    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// - Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
-    /// to fulfill the request.
-    /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to collateralize
-    /// the loan.
-    /// @param sources TODO
-    /// @param liquidity The amount of liquidity to borrow.
-    /// @param shares The amount of shares to supply as collateral.
-    /// @return loanId The identifier of the created loan.
-    function borrowLiquidity(
-        LendingTerms[] calldata sources,
-        uint256 liquidity,
-        uint256 shares
-    ) external returns (uint256 loanId) {
-        require(sources.length > 0 && sources.length < 5, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-
-        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-
-        Loan memory loan;
-
-        loan.borrowFactor       = LendingTermsLibrary.BORROW_FACTOR_MAXIMUM;
-        loan.liquidityBorrowed  = liquidity;
-        loan.sharesSupplied     = shares;
-        loan.sharesValueInitial = vault.convertToAssets(shares);
-
-        uint256 liquidityRemaining = liquidity;
-        uint256 i = 0;
-
-        while (i < sources.length && liquidityRemaining > 0) {
-            LendingTerms calldata source = sources[i];
-
-            (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(source);
-            require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-
-            Bucket storage bucket = buckets[terms];
-
-            uint256 liquidityAvailable;
-            unchecked {
-                liquidityAvailable = bucket.liquiditySupplied - bucket.liquidityBorrowed;
-            }
-
-            if (liquidityAvailable == 0) {
-                continue;
-            }
-
-            uint256 liquidityBorrowed = MathLibrary.min(liquidityAvailable, liquidityRemaining);
-            unchecked {
-                bucket.liquidityBorrowed += liquidityBorrowed;
-            }
-
-            loan.amounts[i] = liquidityBorrowed;
-            loan.sources[i] = terms;
-
-            if (source.borrowFactor < loan.borrowFactor) {
-                loan.borrowFactor = source.borrowFactor;
-            }
-
-            unchecked {
-                liquidityRemaining -= liquidityBorrowed;
-                i++;
-            }
-        }
-
-        require(liquidityRemaining == 0, KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY));
-
-        uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValueInitial, loan.borrowFactor);
-        require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
-
-        loans[loanId = totalLoans] = loan;
-
-        unchecked {
-            totalLoans += 1;
-        }
-    }
-
-    /// @notice Repays borrowed liquidity to this pool.
-    function repayLiquidity(uint256 loanId) external { }
 }
