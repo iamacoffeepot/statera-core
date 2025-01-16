@@ -295,6 +295,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Supplies collateral to this pool.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
     /// @param shares The amount of shares to supply.
     /// @param recipient The address to supply collateral to.
     function supplyCollateral(uint256 shares, address recipient) external {
