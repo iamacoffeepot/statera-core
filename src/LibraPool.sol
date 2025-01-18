@@ -324,6 +324,16 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Withdraws collateral from this pool.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// @param shares The amount of shares to withdraw.
-    function withdrawCollateral(uint256 shares) external { }
+    function withdrawCollateral(uint256 shares) external {
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+        Position storage position = positions[recipient];
+
+        position.sharesSupplied -= shares;
+        unchecked {
+            totalSharesSupplied -= shares;
+        }
+    }
 }
