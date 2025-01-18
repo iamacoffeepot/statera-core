@@ -262,6 +262,25 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
     }
 
+    /// @notice Supplies collateral to this pool.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
+    /// @param shares The amount of shares to supply.
+    /// @param recipient The address to supply collateral to.
+    function supplyCollateral(uint256 shares, address recipient) external {
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+
+        Position storage position = positions[recipient];
+
+        totalSharesSupplied += shares;
+        unchecked {
+            position.sharesSupplied += shares;
+        }
+    }
+
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
     /// @notice
@@ -302,25 +321,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
-    }
-
-    /// @notice Supplies collateral to this pool.
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
-    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
-    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// @param shares The amount of shares to supply.
-    /// @param recipient The address to supply collateral to.
-    function supplyCollateral(uint256 shares, address recipient) external {
-        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-
-        Position storage position = positions[recipient];
-
-        totalSharesSupplied += shares;
-        unchecked {
-            position.sharesSupplied += shares;
-        }
     }
 
     /// @notice Withdraws collateral from this pool.
