@@ -325,10 +325,10 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         Loan memory loan;
 
-        loan.borrowFactor       = LendingTermsLibrary.BORROW_FACTOR_MAXIMUM;
-        loan.liquidityBorrowed  = liquidity;
-        loan.sharesSupplied     = shares;
-        loan.sharesValueInitial = vault.convertToAssets(shares);
+        loan.borrowFactor      = LendingTermsLibrary.BORROW_FACTOR_MAXIMUM;
+        loan.liquidityBorrowed = liquidity;
+        loan.sharesSupplied    = shares;
+        loan.sharesValue       = vault.convertToAssets(shares);
 
         uint256 liquidityRemaining = liquidity;
         uint256 i = 0;
@@ -370,7 +370,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         require(liquidityRemaining == 0, KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY));
 
-        uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValueInitial, loan.borrowFactor);
+        uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValue, loan.borrowFactor);
         require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
 
         loans[loanId = totalLoans] = loan;

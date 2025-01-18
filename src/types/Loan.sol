@@ -7,7 +7,7 @@ struct Loan {
     uint256[4] amounts;
     LendingTermsPacked[4] sources;
     uint256 sharesSupplied;
-    uint256 sharesValueInitial;
+    uint256 sharesValue;
     uint256 liquidityBorrowed;
     Q4x4 borrowFactor;
 }
