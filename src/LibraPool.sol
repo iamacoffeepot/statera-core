@@ -322,4 +322,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
             position.sharesSupplied += shares;
         }
     }
+
+    /// @notice Withdraws collateral from this pool.
+    /// @param shares The amount of shares to withdraw.
+    function withdrawCollateral(uint256 shares) external { }
 }
