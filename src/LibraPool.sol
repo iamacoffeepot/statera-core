@@ -30,6 +30,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     using FixedPointMathLibrary for uint256;
     using LendingTermsLibrary for LendingTerms;
     using LendingTermsLibrary for LendingTermsPacked;
+    using TokenTransferLibrary for Token;
 
     // @custom:todo Are parameters properly indexed?
     event SupplyLiquidity(
@@ -400,7 +401,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         }
 
         require(
-            TokenTransferLibrary.trySafeTransferFrom(asset, msg.sender, address(this), loan.liquidityBorrowed + profitSuppliers),
+            asset.trySafeTransferFrom(msg.sender, address(this), loan.liquidityBorrowed + profitSuppliers),
             KernelError(KernelErrorType.TRANSFER_FAILED)
         );
     }
