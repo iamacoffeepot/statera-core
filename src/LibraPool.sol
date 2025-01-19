@@ -386,4 +386,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         loans[loanId] = loan;
     }
+
+    /// @notice Repays liquidity to this pool.
+    /// @param loanId The identifier of the loan to repay.
+    function repayLiquidity(uint256 loanId) external { }
 }
