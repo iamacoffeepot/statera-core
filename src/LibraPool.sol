@@ -82,6 +82,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     constructor() {
         (timeExpires, timeAuction, vault) = LibraPoolFactory(msg.sender).constructorParameters();
+
+        asset = vault.asset();
     }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
