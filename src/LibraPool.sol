@@ -332,9 +332,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         uint256 i = 0;
 
         while (liquidityRemaining > 0) {
-            if (i >= sources.length) {
-                revert KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY);
-            }
+            require(i < sources.length, KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY));
 
             LendingTerms calldata source = sources[i];
 
