@@ -43,18 +43,18 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         address indexed recipient
     );
 
-    /// @notice The vault whose shares are accepted as collateral.
-    TokenizedVault immutable public vault;
-
     /// @notice The underlying token that `vault` uses for accounting, depositing, and withdrawing.
     Token immutable public asset;
+
+    /// @notice The time at which the auction starts.
+    /// @custom:invariant `timeAuction < timeExpires`
+    uint256 immutable public timeAuction;
 
     /// @notice The time at which this pool expires.
     uint256 immutable public timeExpires;
 
-    /// @notice The time at which the auction starts.
-    /// @custom:invariant `timeAuctionStart < timeExpires`
-    uint256 immutable public timeAuction;
+    /// @notice The vault whose shares are accepted as collateral.
+    TokenizedVault immutable public vault;
 
     /// @notice The total amount of liquidity supplied to the pool.
     uint256 public totalLiquiditySupplied;
@@ -81,7 +81,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
     constructor() {
-        (vault, asset, timeExpires, timeAuction) = LibraPoolFactory(msg.sender).constructorParameters();
+        (timeExpires, timeAuction, vault) = LibraPoolFactory(msg.sender).constructorParameters();
     }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.

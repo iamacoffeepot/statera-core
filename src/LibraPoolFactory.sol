@@ -15,10 +15,9 @@ contract LibraPoolFactory {
     mapping(TokenizedVault vault => LibraPool pool) public pools;
 
     struct ConstructorParameters {
-        TokenizedVault vault;
-        Token asset;
         uint256 timeExpires;
-        uint256 timeAuctionStarts;
+        uint256 timeAuction;
+        TokenizedVault vault;
     }
 
     /// @custom:todo
@@ -32,10 +31,9 @@ contract LibraPoolFactory {
         require(pools[vault] == LibraPool(address(0)), KernelError(KernelErrorType.ILLEGAL_STATE));
 
         constructorParameters = ConstructorParameters({
-            vault: vault,
-            asset: vault.asset(),
-            timeExpires : 0,
-            timeAuctionStarts : 0
+            timeAuction: 0,
+            timeExpires: 0,
+            vault: vault
         });
 
         LibraPool pool = new LibraPool{salt: keccak256(abi.encode(vault))}();
