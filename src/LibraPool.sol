@@ -54,7 +54,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice The time at which the auction starts.
     /// @custom:invariant `timeAuctionStart < timeExpires`
-    uint256 immutable public timeAuctionStarts;
+    uint256 immutable public timeAuction;
 
     /// @notice The total amount of liquidity supplied to the pool.
     uint256 public totalLiquiditySupplied;
@@ -81,7 +81,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
     constructor() {
-        (vault, asset, timeExpires, timeAuctionStarts) = LibraPoolFactory(msg.sender).constructorParameters();
+        (vault, asset, timeExpires, timeAuction) = LibraPoolFactory(msg.sender).constructorParameters();
     }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
@@ -105,12 +105,12 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
     /// @notice This function returns `0` if the auction has already started.
     function getSecondsUntilAuctionStart(uint256 timestamp) public view returns (uint256) {
-        if (timestamp >= timeAuctionStarts) {
+        if (timestamp >= timeAuction) {
             return 0;
         }
 
         unchecked {
-            return timeAuctionStarts - timestamp;
+            return timeAuction - timestamp;
         }
     }
 
