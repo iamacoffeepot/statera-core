@@ -398,6 +398,11 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
             bitmap >>= position;
             bitmap >>= 1;
         }
+
+        require(
+            TokenTransferLibrary.trySafeTransferFrom(asset, msg.sender, address(this), loan.liquidityBorrowed + profitSuppliers),
+            KernelError(KernelErrorType.TRANSFER_FAILED)
+        );
     }
 
     /// @notice Supplies liquidity to this pool.
