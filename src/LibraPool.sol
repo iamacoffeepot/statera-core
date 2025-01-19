@@ -411,17 +411,16 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
             LendingTermsPacked terms = LendingTermsPacked.wrap(position);
 
-            uint256 liquidityBorrowed = loanChunks[loanId][terms];
-
+            uint256 liquidityChunk = loanChunks[loanId][terms];
             unchecked {
-                buckets[terms].liquidityBorrowed += liquidityBorrowed;
+                buckets[terms].liquidityBorrowed += liquidityChunk;
             }
 
             if (profitsTotal > 0) {
                 (/* Q4x4 borrowFactor */, Q4x4 profitFactor) = LendingTermsLibrary.unpack(terms);
 
                 uint256 profitsBucket = FixedPointMathLibrary.multiplyByQ4x4(
-                    MathLibrary.mulDiv(profitsTotal, liquidityBorrowed, loan.liquidityBorrowed),
+                    MathLibrary.mulDiv(profitsTotal, liquidityChunk, loan.liquidityBorrowed),
                     Q4X4_ONE - profitFactor
                 );
 
