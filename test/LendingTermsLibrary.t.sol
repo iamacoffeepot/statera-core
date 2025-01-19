@@ -16,6 +16,16 @@ contract LendingTermsLibraryTest is Test {
         }
     }
 
+    function test_is_valid_profit_factor() external {
+        for (
+            Q4x4 profitFactor = LendingTermsLibrary.PROFIT_FACTOR_MINIMUM;
+            profitFactor <= LendingTermsLibrary.PROFIT_FACTOR_MAXIMUM;
+        ) {
+            assertTrue(LendingTermsLibrary.isValidProfitFactor(profitFactor));
+            unchecked { profitFactor = Q4x4.wrap(Q4x4.unwrap(profitFactor) + 1); }
+        }
+    }
+
     function test_fuzz_try_pack_unpack(Q4x4 borrowFactor, Q4x4 profitFactor) external {
         vm.assume(LendingTermsLibrary.isValidBorrowFactor(borrowFactor));
         vm.assume(LendingTermsLibrary.isValidProfitFactor(profitFactor));
