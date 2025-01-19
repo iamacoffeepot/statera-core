@@ -71,6 +71,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @custom:todo
     mapping(uint256 id => Loan) public loans;
 
+    /// @custom:todo
+    mapping(uint256 id => mapping(LendingTermsPacked => uint256 liquidity)) public loanChunks;
+
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
@@ -309,12 +312,14 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         uint256 liquidity,
         uint256 shares
     ) external returns (uint256 loanId) {
-        require(sources.length > 0 && sources.length < 5, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(sources.length > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
         require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+
+        unchecked { loanId = totalLoans++; }
 
         Loan memory loan;
 
@@ -348,12 +353,13 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
                 bucket.liquidityBorrowed += liquidityBorrowed;
             }
 
-            loan.amounts[i] = liquidityBorrowed;
-            loan.sources[i] = terms;
+            loanChunks[loanId][terms] = liquidityBorrowed;
 
             if (source.borrowFactor < loan.borrowFactor) {
                 loan.borrowFactor = source.borrowFactor;
             }
+
+            loan.bucketBitmap |= 1 << terms.unwrap();
 
             unchecked {
                 liquidityRemaining -= liquidityBorrowed;
@@ -366,10 +372,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValue, loan.borrowFactor);
         require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
 
-        loans[loanId = totalLoans] = loan;
-
-        unchecked {
-            totalLoans += 1;
-        }
+        loans[loanId] = loan;
     }
 }
