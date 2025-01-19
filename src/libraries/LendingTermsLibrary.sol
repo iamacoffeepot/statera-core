@@ -74,6 +74,12 @@ library LendingTermsLibrary {
     }
 
     /// @custom:todo
+    function unpackProfitFactor(LendingTermsPacked packed) internal pure returns (Q4x4 result) {
+        uint8 unwrapped = LendingTermsPacked.unwrap(packed);
+        result = Q4x4.wrap(unwrapped & 0xf);
+    }
+
+    /// @custom:todo
     function unwrap(LendingTermsPacked packed) internal pure returns (uint8 result) {
         return LendingTermsPacked.unwrap(packed);
     }
