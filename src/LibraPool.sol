@@ -169,6 +169,18 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return bucket.liquiditySupplied - bucket.liquidityBorrowed;
     }
 
+    /// @custom:todo
+    function getLoanProfits(uint256 loanId) public view returns (uint256 result) {
+        Loan storage loan = loans[loanId];
+
+        uint256 shareValue = vault.convertToAssets(loan.sharesSupplied);
+        if (shareValue < loan.sharesSupplied) return 0;
+
+        unchecked {
+            return shareValue - loan.sharesValue;
+        }
+    }
+
     /// @notice Returns the amount of liquidity that `supplier` should expect to receive back from a bucket
     /// associated with the given lending terms (`borrowFactor` and `profitFactor`).
     /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
