@@ -1,5 +1,6 @@
 pragma solidity 0.8.27;
 
+import {LibraPoolFactory} from "./LibraPoolFactory.sol";
 import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
@@ -79,7 +80,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
-    constructor() { }
+    constructor() {
+        (vault, asset, timeExpires, timeAuctionStarts) = LibraPoolFactory(msg.sender).constructorParameters();
+    }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
     /// @notice This function returns `0` if this pool has already expired.
