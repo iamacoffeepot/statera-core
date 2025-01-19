@@ -423,7 +423,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Supplies liquidity to this pool.
-    /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
