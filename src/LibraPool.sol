@@ -349,6 +349,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice Repays liquidity to this pool.
     /// @param loanId The identifier of the loan to repay.
     function repayLiquidity(uint256 loanId) external {
+        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+
         Loan storage loan = loans[loanId];
 
         require(loan.active, KernelError(KernelErrorType.ILLEGAL_STATE));
