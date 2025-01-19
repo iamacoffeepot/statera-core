@@ -9,4 +9,9 @@ contract MathLibraryTest is Test {
         vm.assume(a < b);
         assertEq(MathLibrary.min(a, b), a);
     }
+
+    function test_fuzz_max(uint256 a, uint256 b) external {
+        vm.assume(a > b);
+        assertEq(MathLibrary.max(a, b), a);
+    }
 }
