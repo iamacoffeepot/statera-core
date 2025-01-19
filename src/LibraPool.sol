@@ -176,9 +176,12 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         uint256 sharesValue = vault.convertToAssets(position.sharesSupplied);
         if (sharesValue < position.sharesValue) return 0;
 
+        uint256 profitsUnrealized;
         unchecked {
-            return sharesValue - position.sharesValue;
+            profitsUnrealized = sharesValue - position.sharesValue;
         }
+
+        return position.sharesProfits + profitsUnrealized;
     }
 
     /// @notice Returns the amount of liquidity that `supplier` should expect to receive back from a bucket
