@@ -271,8 +271,8 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// - Reverts with a `TRANSFER_FAILED` error if the shares failed to transfer.
-    /// - Reverts with a `TRANSFER_FAILED` error if the assets failed to transfer.
+    /// - Reverts with a `TRANSFER_FAILED` error if the shares fail to transfer.
+    /// - Reverts with a `TRANSFER_FAILED` error if the assets fail to transfer.
     /// - Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
     /// to fulfill the request.
     /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to collateralize
