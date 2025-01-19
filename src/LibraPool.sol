@@ -393,6 +393,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function repayLiquidity(uint256 loanId) external {
         Loan storage loan = loans[loanId];
 
+        require(loan.active, KernelError(KernelErrorType.ILLEGAL_STATE));
+        loan.active = false;
+
         uint256 profitTotal;
         {
             uint256 sharesValue = vault.convertToAssets(loan.sharesSupplied);
