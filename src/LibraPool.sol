@@ -393,17 +393,17 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function repayLiquidity(uint256 loanId) external {
         Loan storage loan = loans[loanId];
 
-        uint256 profitsTotal;
+        uint256 profitTotal;
         {
             uint256 sharesValue = vault.convertToAssets(loan.sharesSupplied);
             if (sharesValue > loan.sharesValue) {
                 unchecked {
-                    profitsTotal = sharesValue - loan.sharesValue;
+                    profitTotal = sharesValue - loan.sharesValue;
                 }
             }
         }
 
-        uint256 profitsSuppliers;
+        uint256 profitSuppliers;
 
         uint256 bitmap = loan.bucketBitmap;
         while (bitmap != 0) {
@@ -416,18 +416,18 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
                 buckets[terms].liquidityBorrowed += liquidityChunk;
             }
 
-            if (profitsTotal > 0) {
+            if (profitTotal > 0) {
                 (/* Q4x4 borrowFactor */, Q4x4 profitFactor) = LendingTermsLibrary.unpack(terms);
 
-                uint256 profitsBucket = FixedPointMathLibrary.multiplyByQ4x4(
-                    MathLibrary.mulDiv(profitsTotal, liquidityChunk, loan.liquidityBorrowed),
+                uint256 profitBucket = FixedPointMathLibrary.multiplyByQ4x4(
+                    MathLibrary.mulDiv(profitTotal, liquidityChunk, loan.liquidityBorrowed),
                     Q4X4_ONE - profitFactor
                 );
 
-                buckets[terms].supplierProfitsRealized += profitsBucket;
+                buckets[terms].supplierProfitsRealized += profitBucket;
 
                 unchecked {
-                    profitsSuppliers += profitsBucket;
+                    profitSuppliers += profitBucket;
                 }
             }
 
