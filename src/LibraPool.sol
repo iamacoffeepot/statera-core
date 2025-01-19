@@ -174,7 +174,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         Position storage position = position[borrower];
 
         uint256 sharesValue = vault.convertToAssets(position.sharesSupplied);
-        if (sharesValue < position.sharesValue) return 0;
+        if (sharesValue < position.sharesValue) return position.sharesProfits;
 
         uint256 profitsUnrealized;
         unchecked {
