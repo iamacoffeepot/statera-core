@@ -4,9 +4,9 @@ import {LendingTermsPacked} from "./LendingTerms.sol";
 import {Q4x4} from "./fixed/Q4x4.sol";
 
 struct Loan {
+    Q4x4 borrowFactor;
     uint256 bucketBitmap;
+    uint256 liquidityBorrowed;
     uint256 sharesSupplied;
     uint256 sharesValue;
-    uint256 liquidityBorrowed;
-    Q4x4 borrowFactor;
 }
