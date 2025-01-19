@@ -403,7 +403,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
             }
         }
 
-        uint256 profitsSupplier;
+        uint256 profitsSuppliers;
 
         uint256 bitmap = loan.bucketBitmap;
         while (bitmap != 0) {
@@ -418,15 +418,17 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
             }
 
             if (profitsTotal > 0) {
-                Q4x4 profitFactor = LendingTermsLibrary.unpackProfitFactor(terms);
+                (/* Q4x4 borrowFactor */, Q4x4 profitFactor) = LendingTermsLibrary.unpack(terms);
 
-                uint256 x = MathLibrary.mulDiv(profitsTotal, liquidityBorrowed, loan.liquidityBorrowed);
-                uint256 y = FixedPointMathLibrary.multiplyByQ4x4(x, Q4X4_ONE - profitFactor);
+                uint256 profitsBucket = FixedPointMathLibrary.multiplyByQ4x4(
+                    MathLibrary.mulDiv(profitsTotal, liquidityBorrowed, loan.liquidityBorrowed),
+                    Q4X4_ONE - profitFactor
+                );
 
-                buckets[terms].supplierProfitsRealized += y;
+                buckets[terms].supplierProfitsRealized += profitsBucket;
 
                 unchecked {
-                    profitsSupplier += y;
+                    profitsSuppliers += profitsBucket;
                 }
             }
 
