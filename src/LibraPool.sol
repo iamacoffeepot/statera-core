@@ -173,11 +173,11 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function getLoanProfits(uint256 loanId) public view returns (uint256 result) {
         Loan storage loan = loans[loanId];
 
-        uint256 shareValue = vault.convertToAssets(loan.sharesSupplied);
-        if (shareValue < loan.sharesSupplied) return 0;
+        uint256 sharesValue = vault.convertToAssets(loan.sharesSupplied);
+        if (sharesValue < loan.sharesValue) return 0;
 
         unchecked {
-            return shareValue - loan.sharesValue;
+            return sharesValue - loan.sharesValue;
         }
     }
 
