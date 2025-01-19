@@ -332,7 +332,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     function withdrawCollateral(uint256 shares) external {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
-        Position storage position = positions[recipient];
+        Position storage position = positions[msg.sender];
 
         position.sharesSupplied -= shares;
         unchecked {
