@@ -42,7 +42,10 @@ library BitMathLibrary {
                 x >>= 2;
             }
 
-            result += 1;
+            if ((x & 0x1) == 0) {
+                result += 1;
+                x >>= 1;
+            }
         }
     }
 }
