@@ -2,7 +2,7 @@ pragma solidity 0.8.27;
 
 import {Test} from "forge-std/Test.sol";
 
-import {BitMathLibrary} from "../../src/libraries/BitMathLibrary.sol";
+import {BitMathLibrary} from "../src/libraries/BitMathLibrary.sol";
 
 contract BitMathLibraryTest is Test {
     function test_find_first_set() external {
