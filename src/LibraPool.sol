@@ -331,7 +331,11 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         uint256 liquidityRemaining = liquidity;
         uint256 i = 0;
 
-        while (i < sources.length && liquidityRemaining > 0) {
+        while (liquidityRemaining > 0) {
+            if (i >= sources.length) {
+                revert KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY);
+            }
+
             LendingTerms calldata source = sources[i];
 
             (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(source);
@@ -366,8 +370,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
                 i++;
             }
         }
-
-        require(liquidityRemaining == 0, KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY));
 
         uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValue, loan.borrowFactor);
         require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
