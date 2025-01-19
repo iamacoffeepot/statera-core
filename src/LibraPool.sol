@@ -335,6 +335,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
         Loan memory loan;
 
+        loan.active            = true;
         loan.borrowFactor      = LendingTermsLibrary.BORROW_FACTOR_MAXIMUM;
         loan.liquidityBorrowed = liquidity;
         loan.sharesSupplied    = shares;
