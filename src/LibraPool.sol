@@ -262,48 +262,6 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         }
     }
 
-    /// @notice Supplies liquidity to this pool.
-    /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
-    /// @notice
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
-    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
-    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// @param borrowFactor TODO
-    /// @param profitFactor The proportion of profits that will be allocated to the borrower.
-    /// @param liquidity The amount of liquidity to supply.
-    /// @param recipient The address to supply liquidity to.
-    function supplyLiquidity(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
-        uint256 liquidity,
-        address recipient
-    ) external {
-        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
-
-        Commitment memory commit = commitments[recipient][terms];
-
-        totalLiquiditySupplied += liquidity;
-        unchecked {
-            bucket.liquiditySupplied += liquidity;
-            commit.liquiditySupplied += liquidity;
-        }
-
-        uint256 liquidityWeighted = liquidity * getSecondsUntilAuctionStart();
-
-        bucket.liquidityWeighted += liquidityWeighted;
-        unchecked {
-            commit.liquidityWeighted += liquidityWeighted;
-        }
-
-        supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
-
-        emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
-    }
-
     /// @notice Borrows liquidity from this pool.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero or greater than 4.
@@ -438,5 +396,47 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
             bitmap >>= position;
             bitmap >>= 1;
         }
+    }
+
+    /// @notice Supplies liquidity to this pool.
+    /// @notice Liquidity cannot be supplied if pool has expired or the auction has started.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
+    /// @param borrowFactor TODO
+    /// @param profitFactor The proportion of profits that will be allocated to the borrower.
+    /// @param liquidity The amount of liquidity to supply.
+    /// @param recipient The address to supply liquidity to.
+    function supplyLiquidity(
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor,
+        uint256 liquidity,
+        address recipient
+    ) external {
+        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
+
+        Commitment memory commit = commitments[recipient][terms];
+
+        totalLiquiditySupplied += liquidity;
+        unchecked {
+            bucket.liquiditySupplied += liquidity;
+            commit.liquiditySupplied += liquidity;
+        }
+
+        uint256 liquidityWeighted = liquidity * getSecondsUntilAuctionStart();
+
+        bucket.liquidityWeighted += liquidityWeighted;
+        unchecked {
+            commit.liquidityWeighted += liquidityWeighted;
+        }
+
+        supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
+
+        emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
 }
