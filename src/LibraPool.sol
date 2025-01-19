@@ -184,6 +184,18 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         return position.sharesProfits + profitsUnrealized;
     }
 
+    /// @custom:todo
+    function getPositionProfitsUnrealized(address borrower) public view returns (uint256 result) {
+        Position storage position = position[borrower];
+
+        uint256 sharesValue = vault.convertToAssets(position.sharesSupplied);
+        if (sharesValue < position.sharesValue) return 0;
+
+        unchecked {
+            return sharesValue - position.sharesValue;
+        }
+    }
+
     /// @notice Returns the amount of liquidity that `supplier` should expect to receive back from a bucket
     /// associated with the given lending terms (`borrowFactor` and `profitFactor`).
     /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
