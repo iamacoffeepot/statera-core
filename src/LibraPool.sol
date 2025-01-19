@@ -31,6 +31,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     using LendingTermsLibrary for LendingTerms;
     using LendingTermsLibrary for LendingTermsPacked;
     using TokenTransferLibrary for Token;
+    using TokenTransferLibrary for TokenizedVault;
 
     // @custom:todo Are parameters properly indexed?
     event SupplyLiquidity(
@@ -449,5 +450,23 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
+    }
+
+    /// @notice Withdraws shares from a loan.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// - Reverts with an `ILLEGAL_STATE` error if the loan is active.
+    /// - Reverts with a `TRANSFER_FAILED` error if the shares were not successfully transferred.
+    /// @param loanId The loan to withdraw shares from.
+    /// @param shares The number of shares to withdraw.
+    function withdrawShares(uint32 loanId, uint256 shares) external {
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+        Loan storage loan = loans[loanId];
+        require(!loan.active, KernelError(KernelErrorType.ILLEGAL_STATE));
+
+        loan.sharesSupplied -= shares;
+
+        require(vault.trySafeTransfer(msg.sender, shares), KernelError(KernelErrorType.TRANSFER_FAILED));
     }
 }
