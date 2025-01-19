@@ -74,6 +74,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
+    /// @custom:todo
+    mapping(address borrower => uint256) public borrowerBucketWeight;
+
     constructor() { }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
