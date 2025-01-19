@@ -427,6 +427,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
+    /// - Reverts with an `TRANSFER_FAILED` error if the liquidity fails to transfer to this pool.
     /// @param borrowFactor TODO
     /// @param profitFactor The proportion of profits that will be allocated to the borrower.
     /// @param liquidity The amount of liquidity to supply.
@@ -459,6 +460,11 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
         }
 
         supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
+
+        require(
+            asset.trySafeTransferFrom(msg.sender, address(this), liquidity),
+            KernelError(KernelErrorType.TRANSFER_FAILED)
+        );
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
