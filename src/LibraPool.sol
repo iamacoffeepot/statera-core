@@ -348,6 +348,9 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     }
 
     /// @notice Repays liquidity to this pool.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
+    /// - Reverts with an `TRANSFER_FAILED` error if repaying the assets back into the pool fails.
     /// @param loanId The identifier of the loan to repay.
     function repayLiquidity(uint256 loanId) external {
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
