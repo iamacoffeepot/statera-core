@@ -37,8 +37,10 @@ library LendingTermsLibrary {
         Q4x4 borrowFactor,
         Q4x4 profitFactor
     ) internal pure returns (LendingTermsPacked result, bool success) {
-        if (isValidBorrowFactor(borrowFactor)) success = false;
-        if (isValidProfitFactor(profitFactor)) success = false;
+        success = true;
+
+        if (!isValidBorrowFactor(borrowFactor)) success = false;
+        if (!isValidProfitFactor(profitFactor)) success = false;
 
         if (success) result = unsafePack(borrowFactor, profitFactor);
     }
