@@ -1,7 +1,6 @@
 pragma solidity 0.8.27;
 
 import {LibraPoolFactory} from "./LibraPoolFactory.sol";
-import {PermitsReadOnlyDelegateCall} from "./PermitsReadOnlyDelegateCall.sol";
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 import {BitmapLibrary} from "./libraries/BitmapLibrary.sol";
@@ -25,7 +24,7 @@ import {
     Q4X4_ONE
 } from "./types/Types.sol";
 
-contract LibraPool is PermitsReadOnlyDelegateCall {
+contract LibraPool {
     using BitmapLibrary for BitmapX256;
     using BucketLibrary for Bucket;
     using FixedPointMathLibrary for uint256;
