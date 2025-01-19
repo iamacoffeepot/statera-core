@@ -390,5 +390,49 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
 
     /// @notice Repays liquidity to this pool.
     /// @param loanId The identifier of the loan to repay.
-    function repayLiquidity(uint256 loanId) external { }
+    function repayLiquidity(uint256 loanId) external {
+        Loan storage loan = loans[loanId];
+
+        uint256 profitsTotal;
+        {
+            uint256 sharesValue = vault.convertToAssets(loan.sharesSupplied);
+            if (sharesValue > loan.sharesValue) {
+                unchecked {
+                    profitsTotal = sharesValue - loan.sharesValue;
+                }
+            }
+        }
+
+        uint256 profitsSupplier;
+
+        uint256 bitmap = loan.bucketBitmap;
+        while (bitmap != 0) {
+            uint8 position = BitMathLibrary.ffs(bitmap);
+
+            LendingTermsPacked terms = LendingTermsPacked.wrap(position);
+
+            uint256 liquidityBorrowed = loanChunks[loanId][terms];
+
+            unchecked {
+                buckets[terms].liquidityBorrowed += liquidityBorrowed;
+            }
+
+            if (profitsTotal > 0) {
+                Q4x4 profitFactor = LendingTermsLibrary.unpackProfitFactor(terms);
+
+                uint256 x = MathLibrary.mulDiv(profitsTotal, liquidityBorrowed, loan.liquidityBorrowed);
+                uint256 y = FixedPointMathLibrary.multiplyByQ4x4(x, Q4X4_ONE - profitFactor);
+
+                buckets[terms].supplierProfitsRealized += y;
+
+                unchecked {
+                    profitsSupplier += y;
+                }
+            }
+
+            // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
+            bitmap >>= position;
+            bitmap >>= 1;
+        }
+    }
 }
