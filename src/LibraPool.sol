@@ -476,7 +476,7 @@ contract LibraPool is PermitsReadOnlyDelegateCall {
     /// - Reverts with a `TRANSFER_FAILED` error if the shares were not successfully transferred.
     /// @param loanId The loan to withdraw shares from.
     /// @param shares The number of shares to withdraw.
-    function withdrawShares(uint32 loanId, uint256 shares) external {
+    function withdrawShares(uint256 loanId, uint256 shares) external {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
         Loan storage loan = loans[loanId];
