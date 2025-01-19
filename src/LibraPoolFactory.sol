@@ -20,7 +20,7 @@ contract LibraPoolFactory {
         TokenizedVault vault;
     }
 
-    /// @custom:todo
+    /// @notice Transient parameters for newly created pools.
     Parameters public parameters;
 
     /// @notice Creates a pool for `vault`.
