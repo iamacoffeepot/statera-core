@@ -11,6 +11,11 @@ contract BitMathLibraryTest is Test {
         }
     }
 
+    function test_find_first_set_reverts_on_zero() external {
+        vm.expectRevert();
+        BitMathLibrary.ffs(0);
+    }
+
     function test_fuzz_find_first_set(uint8 n, uint256 jitter) external {
         // Construct a random-ish input which always has the nth bit set with randomly set bits after those.
         // If the nth bit is the most significant bit then we do nothing as there are no bits to set after.
