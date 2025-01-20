@@ -4,7 +4,6 @@ import {LibraPoolFactory} from "./LibraPoolFactory.sol";
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 import {BitMathLibrary} from "./libraries/BitMathLibrary.sol";
-import {BucketLibrary} from "./libraries/BucketLibrary.sol";
 import {FixedPointMathLibrary} from "./libraries/FixedPointMathLibrary.sol";
 import {LendingTermsLibrary} from "./libraries/LendingTermsLibrary.sol";
 import {MathLibrary} from "./libraries/MathLibrary.sol";
@@ -23,7 +22,6 @@ import {
 } from "./types/Types.sol";
 
 contract LibraPool {
-    using BucketLibrary for Bucket;
     using FixedPointMathLibrary for uint256;
     using LendingTermsLibrary for LendingTerms;
     using LendingTermsLibrary for LendingTermsPacked;
