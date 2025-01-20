@@ -30,7 +30,7 @@ contract LibraPoolFactory {
     function createPool(TokenizedVault vault) external returns (LibraPool result) {
         require(pools[vault] == LibraPool(address(0)), KernelError(KernelErrorType.ILLEGAL_STATE));
 
-        parameters = Parameters({timeAuction: 0, timeExpires: 0, vault: vault});
+        parameters = Parameters({timeAuction: block.timestamp + 1, timeExpires: block.timestamp + 2, vault: vault});
         LibraPool pool = new LibraPool{salt: keccak256(abi.encode(vault))}();
         pools[vault] = pool;
 
