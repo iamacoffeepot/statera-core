@@ -6,6 +6,7 @@ import {MockToken} from "./mocks/MockToken.sol";
 import {MockTokenizedVault} from "./mocks/MockTokenizedVault.sol";
 
 import {LibraPool} from "../src/LibraPool.sol";
+import {LibraPoolFactory} from "../src/LibraPoolFactory.sol";
 import {Token} from "../src/interfaces/Token.sol";
 import {TokenizedVault} from "../src/interfaces/TokenizedVault.sol";
 import {LendingTermsLibrary} from "../src/libraries/LendingTermsLibrary.sol";
