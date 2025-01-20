@@ -43,8 +43,8 @@ library TokenTransferLibrary {
             // to scratch space (0x00-0x3f). We only care about the first thirty two bytes which should be an ABI
             // encoded boolean indicating if the transfer succeeded (when any data is returned at all).
             success := call(
-                gas(),
-                token,
+                gas(),        // gas
+                token,        // address
                 0,            // value
                 pointer,      // input pointer
                 0x64,         // input size
