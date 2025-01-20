@@ -5,11 +5,11 @@ import {Test} from "forge-std/Test.sol";
 import {MockToken} from "./mocks/MockToken.sol";
 import {MockTokenizedVault} from "./mocks/MockTokenizedVault.sol";
 
+import {LibraPool} from "../src/LibraPool.sol";
 import {Token} from "../src/interfaces/Token.sol";
 import {TokenizedVault} from "../src/interfaces/TokenizedVault.sol";
 import {LendingTermsLibrary} from "../src/libraries/LendingTermsLibrary.sol";
 import {Q4x4} from "../src/types/Types.sol";
-import "../src/LibraPool.sol";
 
 contract LibraPoolTest is Test {
     LibraPool public pool;
