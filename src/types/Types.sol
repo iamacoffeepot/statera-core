@@ -5,5 +5,4 @@ import {Commitment} from "./Commitment.sol";
 import {KernelError, KernelErrorType} from "./KernelError.sol";
 import {LendingTerms, LendingTermsPacked} from "./LendingTerms.sol";
 import {Loan} from "./Loan.sol";
-import {BitmapX256} from "./bitmap/BitmapX256.sol";
 import {Q4x4, Q4X4_ONE} from "./fixed/Q4x4.sol";
