@@ -27,11 +27,14 @@ contract MockToken is Token {
         unchecked {
             balanceOf[recipient] += amount;
         }
+
+        emit Transfer(address(0), recipient, amount);
     }
 
     /// @inheritdoc Token
     function approve(address spender, uint256 amount) external returns (bool success) {
         allowance[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
         return true;
     }
 
@@ -41,6 +44,7 @@ contract MockToken is Token {
         unchecked {
             balanceOf[recipient] += amount;
         }
+        emit Transfer(msg.sender, recipient, amount);
         return true;
     }
 
@@ -52,6 +56,7 @@ contract MockToken is Token {
         unchecked {
             balanceOf[recipient] += amount;
         }
+        emit Transfer(owner, recipient, amount);
         return true;
     }
 }
