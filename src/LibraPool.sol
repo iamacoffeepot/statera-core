@@ -293,7 +293,7 @@ contract LibraPool {
         require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
         require(
-            vault.trySafeTransferFrom(msg.sender, address(this), shares),
+            vault.tryTransferFrom(msg.sender, address(this), shares),
             KernelError(KernelErrorType.TRANSFER_FAILED)
         );
 
@@ -354,7 +354,7 @@ contract LibraPool {
         loans[loanId] = loan;
 
         require(
-            asset.trySafeTransferFrom(msg.sender, address(this), liquidity),
+            asset.tryTransferFrom(msg.sender, address(this), liquidity),
             KernelError(KernelErrorType.TRANSFER_FAILED)
         );
     }
@@ -416,7 +416,7 @@ contract LibraPool {
         }
 
         require(
-            asset.trySafeTransferFrom(msg.sender, address(this), loan.liquidityBorrowed + profitSuppliers),
+            asset.tryTransferFrom(msg.sender, address(this), loan.liquidityBorrowed + profitSuppliers),
             KernelError(KernelErrorType.TRANSFER_FAILED)
         );
     }
@@ -461,7 +461,7 @@ contract LibraPool {
         supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
 
         require(
-            asset.trySafeTransferFrom(msg.sender, address(this), liquidity),
+            asset.tryTransferFrom(msg.sender, address(this), liquidity),
             KernelError(KernelErrorType.TRANSFER_FAILED)
         );
 
@@ -483,6 +483,6 @@ contract LibraPool {
 
         loan.sharesSupplied -= shares;
 
-        require(vault.trySafeTransfer(msg.sender, shares), KernelError(KernelErrorType.TRANSFER_FAILED));
+        require(vault.tryTransfer(msg.sender, shares), KernelError(KernelErrorType.TRANSFER_FAILED));
     }
 }

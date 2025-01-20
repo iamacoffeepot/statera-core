@@ -42,7 +42,7 @@ contract TokenTransferLibraryTest is Test {
 
         vm.expectCall(address(token), abi.encodeCall(Token.transferFrom, (owner, recipient, amount)));
 
-        assertFalse(TokenTransferLibrary.trySafeTransferFrom(Token(address(token)), owner, recipient, amount));
+        assertFalse(TokenTransferLibrary.tryTransferFrom(Token(address(token)), owner, recipient, amount));
     }
 
     function test_fuzz_transfer_from_always_revert(address owner, address recipient, uint256 amount) external {
@@ -50,7 +50,7 @@ contract TokenTransferLibraryTest is Test {
 
         vm.expectCall(address(token), abi.encodeCall(Token.transferFrom, (owner, recipient, amount)));
 
-        assertFalse(TokenTransferLibrary.trySafeTransferFrom(Token(address(token)), owner, recipient, amount));
+        assertFalse(TokenTransferLibrary.tryTransferFrom(Token(address(token)), owner, recipient, amount));
     }
 
     function test_fuzz_transfer_from_always_success(address owner, address recipient, uint256 amount) external {
@@ -58,7 +58,7 @@ contract TokenTransferLibraryTest is Test {
 
         vm.expectCall(address(token), abi.encodeCall(Token.transferFrom, (owner, recipient, amount)));
 
-        assertTrue(TokenTransferLibrary.trySafeTransferFrom(Token(address(token)), owner, recipient, amount));
+        assertTrue(TokenTransferLibrary.tryTransferFrom(Token(address(token)), owner, recipient, amount));
     }
 
     function test_fuzz_transfer_from_incomplete_data(address owner, address recipient, uint256 amount) external {
@@ -66,7 +66,7 @@ contract TokenTransferLibraryTest is Test {
 
         vm.expectCall(address(token), abi.encodeCall(Token.transferFrom, (owner, recipient, amount)));
 
-        assertFalse(TokenTransferLibrary.trySafeTransferFrom(Token(address(token)), owner, recipient, amount));
+        assertFalse(TokenTransferLibrary.tryTransferFrom(Token(address(token)), owner, recipient, amount));
     }
 
     function test_fuzz_transfer_from_no_return_data(address owner, address recipient, uint256 amount) external {
@@ -74,6 +74,6 @@ contract TokenTransferLibraryTest is Test {
 
         vm.expectCall(address(token), abi.encodeCall(Token.transferFrom, (owner, recipient, amount)));
 
-        assertTrue(TokenTransferLibrary.trySafeTransferFrom(Token(address(token)), owner, recipient, amount));
+        assertTrue(TokenTransferLibrary.tryTransferFrom(Token(address(token)), owner, recipient, amount));
     }
 }

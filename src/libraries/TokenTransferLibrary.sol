@@ -12,7 +12,7 @@ library TokenTransferLibrary {
     /// @param recipient The address to transfer the tokens to.
     /// @param amount The amount of tokens to transfer.
     /// @return success If the transfer was successful.
-    function trySafeTransfer(Token token, address recipient, uint256 amount) internal returns (bool success) {
+    function tryTransfer(Token token, address recipient, uint256 amount) internal returns (bool success) {
         return false;
     }
 
@@ -22,7 +22,7 @@ library TokenTransferLibrary {
     /// @param recipient The address to transfer the tokens to.
     /// @param amount The amount of tokens to transfer.
     /// @return success If the transfer was successful.
-    function trySafeTransferFrom(
+    function tryTransferFrom(
         Token token,
         address owner,
         address recipient,
