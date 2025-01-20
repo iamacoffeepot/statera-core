@@ -53,7 +53,7 @@ library TokenTransferLibrary {
             )
 
             // +---------+----------------+------------------+----------------+----------+
-            // | success | returndatasize | memory[0x0:0x20] | extcodesize    | 'success |
+            // | success | returndatasize | memory[0x0:0x20] | extcodesize    | success' |
             // +---------+----------------+------------------+----------------+----------+
             // | 0       | *              | *                | *              | 0        |
             // | 1       | 0              | *                | 0              | 0        |
