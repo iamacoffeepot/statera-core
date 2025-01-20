@@ -21,6 +21,14 @@ contract MockToken is Token {
     /// @inheritdoc Token
     mapping(address owner => uint256 balance) public override balanceOf;
 
+    // @notice Mints `amount` tokens to `recipient`.
+    function mint(address recipient, uint256 amount) external {
+        totalSupply += amount;
+        unchecked {
+            balanceOf[recipient] += amount;
+        }
+    }
+
     /// @inheritdoc Token
     function approve(address spender, uint256 amount) external returns (bool success) {
         allowance[msg.sender][spender] = amount;
