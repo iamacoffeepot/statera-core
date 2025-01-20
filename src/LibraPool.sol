@@ -3,7 +3,6 @@ pragma solidity 0.8.27;
 import {LibraPoolFactory} from "./LibraPoolFactory.sol";
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
-import {BitmapLibrary} from "./libraries/BitmapLibrary.sol";
 import {BitMathLibrary} from "./libraries/BitMathLibrary.sol";
 import {BucketLibrary} from "./libraries/BucketLibrary.sol";
 import {FixedPointMathLibrary} from "./libraries/FixedPointMathLibrary.sol";
@@ -12,7 +11,6 @@ import {MathLibrary} from "./libraries/MathLibrary.sol";
 import {TokenTransferLibrary} from "./libraries/TokenTransferLibrary.sol";
 
 import {
-    BitmapX256,
     Bucket,
     Commitment,
     LendingTerms,
@@ -25,7 +23,6 @@ import {
 } from "./types/Types.sol";
 
 contract LibraPool {
-    using BitmapLibrary for BitmapX256;
     using BucketLibrary for Bucket;
     using FixedPointMathLibrary for uint256;
     using LendingTermsLibrary for LendingTerms;

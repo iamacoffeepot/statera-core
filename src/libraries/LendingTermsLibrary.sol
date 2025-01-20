@@ -1,7 +1,6 @@
 pragma solidity 0.8.27;
 
 import {
-    BitmapX256,
     LendingTerms,
     LendingTermsPacked,
     Q4x4
