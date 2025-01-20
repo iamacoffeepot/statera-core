@@ -1,7 +1,13 @@
 pragma solidity 0.8.27;
 
-/// @notice An interface that defines the functions that a contract must implement to adhere to the ERC-20 Token Standard.
+/// @notice An interface that defines the functions and events that a contract must implement to adhere to the ERC-20 Token Standard.
 interface Token {
+    /// @notice Emitted when `owner` approves `spender` to spend `value` tokens on their behalf.
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    /// @notice Emitted when `amount` tokens are transferred from `owner` to `recipient`.
+    event Transfer(address indexed owner, address indexed recipient, uint256 amount);
+
     /// @notice The name of the token.
     /// @dev At the time that the ERC-20 specification was written this function was considered optional. However,
     /// in practice it is considered unusual for a contract implementing the ERC-20 specification to not include this
