@@ -57,16 +57,14 @@ library TokenTransferLibrary {
             // +---------+----------------+------------------+----------------+----------+
             // | 0       | *              | *                | *              | 0        |
             // | 1       | 0              | *                | 0              | 0        |
+            // | 1       | 0              | *                | x > 0          | 1        |
             // | 1       | 0 < x < 32     | *                | *              | 0        |
             // | 1       | x >= 32        | ^1               | *              | 0        |
-            // | 1       | 0              | *                | x >= 0         | 1        |
-            // | 1       | x >= 32        | 1                | *              | 1        |
             // | 1       | x >= 32        | 1                | *              | 1        |
             // +---------+----------------+------------------+----------------+----------+
             //
             // Because call does not return false if the contract does not exist we must check that there exists a
             // response from the contract (which implies it exists) or check manually that the contract exists.
-            //
             // See https://github.com/ethereum/solidity/issues/4823 for more information.
 
             if success {
