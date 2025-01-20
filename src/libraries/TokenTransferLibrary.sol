@@ -3,7 +3,7 @@ pragma solidity 0.8.27;
 import {Token} from "../interfaces/Token.sol";
 
 /// @dev Alias of `type(uint160).max` for use in inline assembly.
-uint256 constant UINT160_MAXIMUM = 0xffffffffffffffffffffffffffffffffffffffff;
+uint256 constant UINT160_MAXIMUM = 0x00ffffffffffffffffffffffffffffffffffffffff;
 
 /// @notice A collection of functions to transfer tokens that may or may not conform to the ERC-20 standard.
 library TokenTransferLibrary {
