@@ -13,6 +13,7 @@ import {LendingTermsLibrary} from "../src/libraries/LendingTermsLibrary.sol";
 
 
 import {
+    Bucket,
     Commitment,
     LendingTermsPacked,
     Q4x4
@@ -50,6 +51,25 @@ contract LibraPoolTest is Test {
 
         LibraPoolFactory poolFactory = new LibraPoolFactory();
         pool = poolFactory.createPool(vault);
+    }
+
+    function test_fuzz_supply_liquidity_increases_supplied_of_bucket(
+        address caller,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor,
+        uint256 liquidity,
+        address recipient
+    ) external
+        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        mintsAssetsTo(caller, liquidity)
+        performsCallsAs(caller)
+    {
+        assertTrue(asset.approve(address(pool), liquidity));
+        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+
+        (LendingTermsPacked terms, Bucket memory bucket) = pool.getBucket(borrowFactor, profitFactor);
+
+        assertEq(bucket.liquiditySupplied, liquidity);
     }
 
     function test_fuzz_supply_liquidity_increases_supplied_of_recipient(
