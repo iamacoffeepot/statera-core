@@ -136,6 +136,27 @@ contract LibraPool {
         return (terms, buckets[terms]);
     }
 
+    /// @custom:todo
+    function getCommitment(
+        address supplier,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor
+    ) public view returns (LendingTermsPacked terms, Commitment memory commitment) {
+        (LendingTermsPacked terms, Commitment storage commitment) = getCommitmentPointer(supplier, borrowFactor, profitFactor);
+        return (terms, commitment);
+    }
+
+    /// @custom:todo
+    function getCommitmentPointer(
+        address supplier,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor
+    ) internal view returns (LendingTermsPacked terms, Commitment storage commitment) {
+        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
+        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        return (terms, commitments[supplier][terms]);
+    }
+
     /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
     /// given lending terms (`borrowFactor` and `profitFactor`).
     function getBucketProfitsUnrealized(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
@@ -443,7 +464,7 @@ contract LibraPool {
 
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
-        Commitment memory commit = commitments[recipient][terms];
+        Commitment storage commit = commitments[recipient][terms];
 
         totalLiquiditySupplied += liquidity;
         unchecked {
