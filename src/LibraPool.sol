@@ -100,7 +100,7 @@ contract LibraPool {
 
     /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
     /// @notice This function returns `0` if the auction has already started.
-    function getSecondsUntilAuctionStart(uint256 timestamp) public view returns (uint256) {
+    function getSecondsUntilAuction(uint256 timestamp) public view returns (uint256) {
         if (timestamp >= timeAuction) {
             return 0;
         }
@@ -112,8 +112,8 @@ contract LibraPool {
 
     /// @notice Returns the number of seconds remaining until the auction starts.
     /// @notice This function returns `0` if the auction has already started.
-    function getSecondsUntilAuctionStart() public view returns (uint256) {
-        return getSecondsUntilAuctionStart(block.timestamp);
+    function getSecondsUntilAuction() public view returns (uint256) {
+        return getSecondsUntilAuction(block.timestamp);
     }
 
     /// @custom:todo
@@ -311,7 +311,7 @@ contract LibraPool {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
         require(
             vault.tryTransferFrom(msg.sender, address(this), shares),
@@ -460,7 +460,7 @@ contract LibraPool {
     ) external {
         require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
@@ -472,7 +472,7 @@ contract LibraPool {
             commit.liquiditySupplied += liquidity;
         }
 
-        uint256 liquidityWeighted = liquidity * getSecondsUntilAuctionStart();
+        uint256 liquidityWeighted = liquidity * getSecondsUntilAuction();
 
         bucket.liquidityWeighted += liquidityWeighted;
         unchecked {

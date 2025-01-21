@@ -48,7 +48,7 @@ contract LibraPoolTest is Test {
 
         // TODO: Gracefully prevent overflow when calculating weighted liquidity
         unchecked {
-            uint256 secondsUntilAuction = pool.getSecondsUntilAuctionStart();
+            uint256 secondsUntilAuction = pool.getSecondsUntilAuction();
             vm.assume(secondsUntilAuction == 0 || liquidity == liquidity * secondsUntilAuction / secondsUntilAuction);
         }
         _;
