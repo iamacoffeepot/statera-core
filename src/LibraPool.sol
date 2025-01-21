@@ -464,7 +464,7 @@ contract LibraPool {
 
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
-        Commitment memory commit = commitments[recipient][terms];
+        Commitment storage commit = commitments[recipient][terms];
 
         totalLiquiditySupplied += liquidity;
         unchecked {
