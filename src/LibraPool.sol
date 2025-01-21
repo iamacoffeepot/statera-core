@@ -80,24 +80,6 @@ contract LibraPool {
         asset = vault.asset();
     }
 
-    /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
-    /// @notice This function returns `0` if this pool has already expired.
-    function getSecondsUntilExpiration(uint256 timestamp) public view returns (uint256) {
-        if (timestamp >= timeExpires) {
-            return 0;
-        }
-
-        unchecked {
-            return timeExpires - timestamp;
-        }
-    }
-
-    /// @notice Returns the number of seconds remaining until this pool expires.
-    /// @notice This function returns `0` if this pool has already expired.
-    function getSecondsUntilExpiration() public view returns (uint256) {
-        return getSecondsUntilExpiration(block.timestamp);
-    }
-
     /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
     /// @notice This function returns `0` if the auction has already started.
     function getSecondsUntilAuction(uint256 timestamp) public view returns (uint256) {
@@ -114,6 +96,24 @@ contract LibraPool {
     /// @notice This function returns `0` if the auction has already started.
     function getSecondsUntilAuction() public view returns (uint256) {
         return getSecondsUntilAuction(block.timestamp);
+    }
+
+    /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
+    /// @notice This function returns `0` if this pool has already expired.
+    function getSecondsUntilExpiration(uint256 timestamp) public view returns (uint256) {
+        if (timestamp >= timeExpires) {
+            return 0;
+        }
+
+        unchecked {
+            return timeExpires - timestamp;
+        }
+    }
+
+    /// @notice Returns the number of seconds remaining until this pool expires.
+    /// @notice This function returns `0` if this pool has already expired.
+    function getSecondsUntilExpiration() public view returns (uint256) {
+        return getSecondsUntilExpiration(block.timestamp);
     }
 
     /// @custom:todo
