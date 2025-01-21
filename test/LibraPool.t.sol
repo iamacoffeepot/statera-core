@@ -108,4 +108,21 @@ contract LibraPoolTest is Test {
         pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
         assertEq(pool.totalLiquiditySupplied(), liquidity);
     }
+
+    function test_fuzz_supply_liquidity_transfers_assets_from_caller(
+        address caller,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor,
+        uint256 liquidity,
+        address recipient
+    ) external
+        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        mintsAssetsTo(caller, liquidity)
+        performsCallsAs(caller)
+    {
+        assertTrue(asset.approve(address(pool), liquidity));
+        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        assertEq(asset.balanceOf(address(pool)), liquidity);
+        assertEq(asset.balanceOf(address(caller)), 0);
+    }
 }
