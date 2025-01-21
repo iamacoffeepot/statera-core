@@ -11,6 +11,12 @@ import {
 } from "./types/Types.sol";
 
 contract LibraPoolFactory {
+    /// @notice The time that all pool auctions start at.
+    uint256 public immutable timeAuction;
+
+    /// @notice The time that all pools expire at.
+    uint256 public immutable timeExpires;
+
     /// @custom:todo
     mapping(TokenizedVault vault => LibraPool pool) public pools;
 
@@ -23,6 +29,11 @@ contract LibraPoolFactory {
     /// @notice Transient parameters for newly created pools.
     Parameters public parameters;
 
+    constructor(uint256 _timeAuction_, uint256 _timeExpires_) {
+        timeAuction = _timeAuction_;
+        timeExpires = _timeExpires_;
+    }
+
     /// @notice Creates a pool for `vault`.
     /// @notice
     /// - Reverts with an `ILLEGAL_STATE` error if a pool already exists for `vault`.
@@ -30,7 +41,7 @@ contract LibraPoolFactory {
     function createPool(TokenizedVault vault) external returns (LibraPool result) {
         require(pools[vault] == LibraPool(address(0)), KernelError(KernelErrorType.ILLEGAL_STATE));
 
-        parameters = Parameters({timeAuction: block.timestamp + 1, timeExpires: block.timestamp + 2, vault: vault});
+        parameters = Parameters({timeAuction: timeAuction, timeExpires: timeExpires, vault: vault});
         LibraPool pool = new LibraPool{salt: keccak256(abi.encode(vault))}();
         pools[vault] = pool;
 
