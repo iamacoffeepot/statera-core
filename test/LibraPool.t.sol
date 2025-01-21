@@ -15,6 +15,8 @@ import {LendingTermsLibrary} from "../src/libraries/LendingTermsLibrary.sol";
 import {
     Bucket,
     Commitment,
+    KernelError,
+    KernelErrorType,
     LendingTermsPacked,
     Q4x4
 } from "../src/types/Types.sol";
@@ -173,5 +175,57 @@ contract LibraPoolTest is Test {
         assertEq(pool.getSecondsUntilExpiration(pool.timeExpires() + 1), 0);
         assertEq(pool.getSecondsUntilExpiration(pool.timeExpires() - 1), 1);
         assertEq(pool.getSecondsUntilExpiration(0), pool.timeExpires());
+    }
+
+    function test_supply_liquidity_reverts_when_borrow_factor_is_invalid() external {
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
+        pool.supplyLiquidity(
+            Q4x4.wrap(type(uint8).max),
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            1,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_liquidity_is_zero() external {
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            0,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_profit_factor_is_invalid() external {
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            Q4x4.wrap(type(uint8).max),
+            1,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_auction_active() external {
+        vm.warp(pool.timeAuction());
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_STATE)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
+            1,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_pool_expired() external {
+        vm.warp(pool.timeExpires());
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_STATE)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
+            1,
+            address(0xdead)
+        );
     }
 }
