@@ -183,8 +183,8 @@ contract LibraPool {
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// - Reverts with a `TRANSFER_FAILED` error if the shares fail to transfer.
-    /// - Reverts with a `TRANSFER_FAILED` error if the assets fail to transfer.
+    /// - Reverts with an `TRANSFER_FAILED` error if the shares fail to transfer.
+    /// - Reverts with an `TRANSFER_FAILED` error if the assets fail to transfer.
     /// - Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
     /// to fulfill the request.
     /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to collateralize
@@ -385,7 +385,7 @@ contract LibraPool {
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the loan is active.
-    /// - Reverts with a `TRANSFER_FAILED` error if the shares were not successfully transferred.
+    /// - Reverts with an `TRANSFER_FAILED` error if the shares were not successfully transferred.
     /// @param loanId The loan to withdraw shares from.
     /// @param shares The number of shares to withdraw.
     function withdrawShares(uint256 loanId, uint256 shares) external {
