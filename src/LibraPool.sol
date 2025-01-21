@@ -75,7 +75,7 @@ contract LibraPool {
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
     constructor() {
-        (timeExpires, timeAuction, vault) = LibraPoolFactory(msg.sender).parameters();
+        (timeAuction, timeExpires, vault) = LibraPoolFactory(msg.sender).parameters();
 
         asset = vault.asset();
     }
