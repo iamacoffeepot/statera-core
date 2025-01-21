@@ -160,4 +160,11 @@ contract LibraPoolTest is Test {
         LendingTermsPacked terms = LendingTermsLibrary.unsafePack(borrowFactor, profitFactor);
         assertEq(pool.supplierBucketBitmap(recipient), 1 << terms.unwrap());
     }
+    
+    function test_get_seconds_until_auction() external {
+        assertEq(pool.getSecondsUntilAuction(pool.timeAuction()), 0);
+        assertEq(pool.getSecondsUntilAuction(pool.timeAuction() + 1), 0);
+        assertEq(pool.getSecondsUntilAuction(pool.timeAuction() - 1), 1);
+        assertEq(pool.getSecondsUntilAuction(0), pool.timeAuction());
+    }
 }
