@@ -21,8 +21,8 @@ contract LibraPoolFactory {
     mapping(TokenizedVault vault => LibraPool pool) public pools;
 
     struct Parameters {
-        uint256 timeExpires;
         uint256 timeAuction;
+        uint256 timeExpires;
         TokenizedVault vault;
     }
 
