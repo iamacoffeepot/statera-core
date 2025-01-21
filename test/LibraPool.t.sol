@@ -20,6 +20,8 @@ import {
 } from "../src/types/Types.sol";
 
 contract LibraPoolTest is Test {
+    using LendingTermsLibrary for LendingTermsPacked;
+
     LibraPool public pool;
     Token public asset;
     TokenizedVault public vault;
@@ -124,5 +126,23 @@ contract LibraPoolTest is Test {
         pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
         assertEq(asset.balanceOf(address(pool)), liquidity);
         assertEq(asset.balanceOf(address(caller)), 0);
+    }
+
+    function test_fuzz_supply_liquidity_updates_recipient_bucket_bitmap(
+        address caller,
+        Q4x4 borrowFactor,
+        Q4x4 profitFactor,
+        uint256 liquidity,
+        address recipient
+    ) external
+        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        mintsAssetsTo(caller, liquidity)
+        performsCallsAs(caller)
+    {
+        assertTrue(asset.approve(address(pool), liquidity));
+        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+
+        LendingTermsPacked terms = LendingTermsLibrary.unsafePack(borrowFactor, profitFactor);
+        assertEq(pool.supplierBucketBitmap(recipient), 1 << terms.unwrap());
     }
 }
