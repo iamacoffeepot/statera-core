@@ -69,9 +69,16 @@ contract LibraPoolTest is Test {
         assertTrue(asset.approve(address(pool), liquidity));
         pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
-        (LendingTermsPacked terms, Bucket memory bucket) = pool.getBucket(borrowFactor, profitFactor);
+        (
+            /* uint256 liquidityBorrowed */,
+            uint256 liquiditySupplied,
+            /* uint256 liquidityWeighted */,
+            /* uint256 sharesSupplied */,
+            /* uint256 sharesValueInitial */,
+            /* uint256 supplierProfitsRealized */
+        ) = pool.buckets(LendingTermsLibrary.unsafePack(borrowFactor, profitFactor));
 
-        assertEq(bucket.liquiditySupplied, liquidity);
+        assertEq(liquiditySupplied, liquidity);
     }
 
     function test_fuzz_supply_liquidity_increases_supplied_of_recipient(
@@ -88,11 +95,12 @@ contract LibraPoolTest is Test {
         assertTrue(asset.approve(address(pool), liquidity));
         pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
-        (LendingTermsPacked terms, Commitment memory commitment) = pool.getCommitment(
-            recipient, borrowFactor, profitFactor
-        );
+        (
+            uint256 liquiditySupplied,
+            /* uint256 liquidityWeighted */
+        ) = pool.commitments(LendingTermsLibrary.unsafePack(borrowFactor, profitFactor));
 
-        assertEq(commitment.liquiditySupplied, liquidity);
+        assertEq(liquiditySupplied, liquidity);
     }
 
     function test_fuzz_supply_liquidity_increases_total_liquidity_supplied(
