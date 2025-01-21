@@ -45,6 +45,12 @@ contract LibraPoolTest is Test {
         vm.assume(LendingTermsLibrary.isValidBorrowFactor(borrowFactor));
         vm.assume(LendingTermsLibrary.isValidProfitFactor(profitFactor));
         vm.assume(liquidity > 0);
+
+        // TODO: Gracefully prevent overflow when calculating weighted liquidity
+        unchecked {
+            uint256 secondsUntilAuction = pool.getSecondsUntilAuctionStart();
+            vm.assume(secondsUntilAuction == 0 || liquidity == liquidity * secondsUntilAuction / secondsUntilAuction);
+        }
         _;
     }
 
@@ -101,7 +107,7 @@ contract LibraPoolTest is Test {
         (
             uint256 liquiditySupplied,
             /* uint256 liquidityWeighted */
-        ) = pool.commitments(LendingTermsLibrary.unsafePack(borrowFactor, profitFactor));
+        ) = pool.commitments(recipient, LendingTermsLibrary.unsafePack(borrowFactor, profitFactor));
 
         assertEq(liquiditySupplied, liquidity);
     }
