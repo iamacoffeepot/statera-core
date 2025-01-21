@@ -82,8 +82,6 @@ contract LibraPoolTest is Test {
             /* uint256 liquidityBorrowed */,
             uint256 liquiditySupplied,
             /* uint256 liquidityWeighted */,
-            /* uint256 sharesSupplied */,
-            /* uint256 sharesValueInitial */,
             /* uint256 supplierProfitsRealized */
         ) = pool.buckets(LendingTermsLibrary.unsafePack(borrowFactor, profitFactor));
 
