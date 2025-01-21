@@ -168,7 +168,6 @@ contract LibraPoolTest is Test {
         assertEq(pool.getSecondsUntilAuction(0), pool.timeAuction());
     }
 
-
     function test_get_seconds_until_expiration() external {
         assertEq(pool.getSecondsUntilExpiration(pool.timeExpires()), 0);
         assertEq(pool.getSecondsUntilExpiration(pool.timeExpires() + 1), 0);
