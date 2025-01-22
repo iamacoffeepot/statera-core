@@ -75,9 +75,27 @@ contract LibraPool {
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
     constructor() {
-        (timeExpires, timeAuction, vault) = LibraPoolFactory(msg.sender).parameters();
+        (timeAuction, timeExpires, vault) = LibraPoolFactory(msg.sender).parameters();
 
         asset = vault.asset();
+    }
+
+    /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
+    /// @notice This function returns `0` if the auction has already started.
+    function getSecondsUntilAuction(uint256 timestamp) public view returns (uint256) {
+        if (timestamp >= timeAuction) {
+            return 0;
+        }
+
+        unchecked {
+            return timeAuction - timestamp;
+        }
+    }
+
+    /// @notice Returns the number of seconds remaining until the auction starts.
+    /// @notice This function returns `0` if the auction has already started.
+    function getSecondsUntilAuction() public view returns (uint256) {
+        return getSecondsUntilAuction(block.timestamp);
     }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
@@ -96,24 +114,6 @@ contract LibraPool {
     /// @notice This function returns `0` if this pool has already expired.
     function getSecondsUntilExpiration() public view returns (uint256) {
         return getSecondsUntilExpiration(block.timestamp);
-    }
-
-    /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
-    /// @notice This function returns `0` if the auction has already started.
-    function getSecondsUntilAuctionStart(uint256 timestamp) public view returns (uint256) {
-        if (timestamp >= timeAuction) {
-            return 0;
-        }
-
-        unchecked {
-            return timeAuction - timestamp;
-        }
-    }
-
-    /// @notice Returns the number of seconds remaining until the auction starts.
-    /// @notice This function returns `0` if the auction has already started.
-    function getSecondsUntilAuctionStart() public view returns (uint256) {
-        return getSecondsUntilAuctionStart(block.timestamp);
     }
 
     /// @custom:todo
@@ -157,114 +157,6 @@ contract LibraPool {
         return (terms, commitments[supplier][terms]);
     }
 
-    /// @notice Returns the amount of profits that have are yet to be realized for a bucket associated with the
-    /// given lending terms (`borrowFactor` and `profitFactor`).
-    function getBucketProfitsUnrealized(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
-        (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
-
-        // All recorded profits are final when the pool expires.
-        if (getSecondsUntilExpiration() == 0) return 0;
-
-        // This computation assumes that TokenizedVault.convertToAssets(x) is additive:
-        // f(x) + f(y) + f(z) + ... = f(x + y + z + ...)
-        //
-        // U_1 = V_1 - K_1
-        // U_2 = V_2 - K_2
-        // ...
-        // U_i = V_i - K_i
-        //
-        // U_1 + U_2 + ... U_N = V_0 + V_1 + ... + V_2 - K_1 - K_2 - ... K_N
-        //
-        // ΣU = ΣV - ΣK
-        uint256 currentValue = vault.convertToAssets(bucket.sharesSupplied);
-        if (bucket.sharesValueInitial > currentValue) return 0;
-
-        unchecked {
-            return currentValue - bucket.sharesValueInitial;
-        }
-    }
-
-    /// @notice Returns the amount of liquidity that is available to be borrowed from a bucket associated with
-    /// the given lending terms (`borrowFactor` and `profitFactor`).
-    function getBucketLiquidityAvailable(Q4x4 borrowFactor, Q4x4 profitFactor) public view returns (uint256 result) {
-        (/* LendingTermsPacked terms */, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
-        return bucket.liquiditySupplied - bucket.liquidityBorrowed;
-    }
-
-    /// @custom:todo
-    function getLoanProfits(uint256 loanId) public view returns (uint256 result) {
-        Loan storage loan = loans[loanId];
-
-        uint256 sharesValue = vault.convertToAssets(loan.sharesSupplied);
-        if (sharesValue < loan.sharesValue) return 0;
-
-        unchecked {
-            return sharesValue - loan.sharesValue;
-        }
-    }
-
-    /// @notice Returns the amount of liquidity that `supplier` should expect to receive back from a bucket
-    /// associated with the given lending terms (`borrowFactor` and `profitFactor`).
-    /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
-    function getSupplierLiquidity(
-        address supplier,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
-    ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
-
-        Commitment storage commit = commitments[supplier][terms];
-        if (commit.liquidityWeighted == 0) return 0;
-
-        uint256 liquidityAvailable;
-        unchecked {
-            liquidityAvailable = bucket.liquiditySupplied - bucket.liquidityBorrowed;
-        }
-
-        return MathLibrary.mulDiv(liquidityAvailable, commit.liquiditySupplied, bucket.liquiditySupplied);
-    }
-
-    /// @notice Returns the amount of profits in `asset` that `supplier` should expect to receive from a bucket
-    /// associated with the given lending terms (`borrowFactor` and `profitFactor`).
-    /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
-    function getSupplierProfits(
-        address supplier,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
-    ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
-
-        Commitment storage commit = commitments[supplier][terms];
-        if (commit.liquidityWeighted == 0) return 0;
-
-        uint256 supplierProfitsUnrealized = FixedPointMathLibrary.multiplyByQ4x4(
-            getBucketProfitsUnrealized(borrowFactor, profitFactor),
-            Q4X4_ONE - profitFactor
-        );
-
-        return MathLibrary.mulDiv(
-            supplierProfitsUnrealized + bucket.supplierProfitsRealized,
-            commit.liquidityWeighted,
-            bucket.liquidityWeighted
-        );
-    }
-
-    /// @notice Returns the number of shares of `vault` that `supplier` should expect to receive from the loans
-    /// associated for a bucket with the given lending terms (`borrowFactor` and `profitFactor`) default.
-    /// @notice This value must only be used as an estimate when `getSecondsUntilExpiration() > 0`.
-    function getSupplierShares(
-        address supplier,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
-    ) public view returns (uint256 result) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
-
-        Commitment storage commit = commitments[supplier][terms];
-        if (commit.liquidityWeighted == 0) return 0;
-
-        return MathLibrary.mulDiv(bucket.sharesSupplied, commit.liquidityWeighted, bucket.liquidityWeighted);
-    }
-
     /// @notice Returns the total amount of liquidity supplied by `supplier` across all buckets.
     function getSupplierTotalLiquidity(address supplier) public view returns (uint256 result) {
         uint256 bitmap = supplierBucketBitmap[supplier];
@@ -291,8 +183,8 @@ contract LibraPool {
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// - Reverts with a `TRANSFER_FAILED` error if the shares fail to transfer.
-    /// - Reverts with a `TRANSFER_FAILED` error if the assets fail to transfer.
+    /// - Reverts with an `TRANSFER_FAILED` error if the shares fail to transfer.
+    /// - Reverts with an `TRANSFER_FAILED` error if the assets fail to transfer.
     /// - Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
     /// to fulfill the request.
     /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to collateralize
@@ -311,7 +203,7 @@ contract LibraPool {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
         require(
             vault.tryTransferFrom(msg.sender, address(this), shares),
@@ -460,7 +352,7 @@ contract LibraPool {
     ) external {
         require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuctionStart() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
@@ -472,7 +364,7 @@ contract LibraPool {
             commit.liquiditySupplied += liquidity;
         }
 
-        uint256 liquidityWeighted = liquidity * getSecondsUntilAuctionStart();
+        uint256 liquidityWeighted = liquidity * getSecondsUntilAuction();
 
         bucket.liquidityWeighted += liquidityWeighted;
         unchecked {
@@ -493,7 +385,7 @@ contract LibraPool {
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the loan is active.
-    /// - Reverts with a `TRANSFER_FAILED` error if the shares were not successfully transferred.
+    /// - Reverts with an `TRANSFER_FAILED` error if the shares were not successfully transferred.
     /// @param loanId The loan to withdraw shares from.
     /// @param shares The number of shares to withdraw.
     function withdrawShares(uint256 loanId, uint256 shares) external {

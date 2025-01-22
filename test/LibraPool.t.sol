@@ -15,6 +15,8 @@ import {LendingTermsLibrary} from "../src/libraries/LendingTermsLibrary.sol";
 import {
     Bucket,
     Commitment,
+    KernelError,
+    KernelErrorType,
     LendingTermsPacked,
     Q4x4
 } from "../src/types/Types.sol";
@@ -45,13 +47,22 @@ contract LibraPoolTest is Test {
         vm.assume(LendingTermsLibrary.isValidBorrowFactor(borrowFactor));
         vm.assume(LendingTermsLibrary.isValidProfitFactor(profitFactor));
         vm.assume(liquidity > 0);
+
+        // TODO: Gracefully prevent overflow when calculating weighted liquidity
+        unchecked {
+            uint256 secondsUntilAuction = pool.getSecondsUntilAuction();
+            vm.assume(secondsUntilAuction == 0 || liquidity == liquidity * secondsUntilAuction / secondsUntilAuction);
+        }
         _;
     }
 
     function setUp() external {
         vault = new MockTokenizedVault(asset = new MockToken());
 
-        LibraPoolFactory poolFactory = new LibraPoolFactory();
+        LibraPoolFactory poolFactory = new LibraPoolFactory({
+            _timeAuction_: block.timestamp + 1 hours,
+            _timeExpires_: block.timestamp + 2 hours
+        });
         pool = poolFactory.createPool(vault);
     }
 
@@ -69,9 +80,14 @@ contract LibraPoolTest is Test {
         assertTrue(asset.approve(address(pool), liquidity));
         pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
-        (LendingTermsPacked terms, Bucket memory bucket) = pool.getBucket(borrowFactor, profitFactor);
+        (
+            /* uint256 liquidityBorrowed */,
+            uint256 liquiditySupplied,
+            /* uint256 liquidityWeighted */,
+            /* uint256 supplierProfitsRealized */
+        ) = pool.buckets(LendingTermsLibrary.unsafePack(borrowFactor, profitFactor));
 
-        assertEq(bucket.liquiditySupplied, liquidity);
+        assertEq(liquiditySupplied, liquidity);
     }
 
     function test_fuzz_supply_liquidity_increases_supplied_of_recipient(
@@ -88,11 +104,12 @@ contract LibraPoolTest is Test {
         assertTrue(asset.approve(address(pool), liquidity));
         pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
-        (LendingTermsPacked terms, Commitment memory commitment) = pool.getCommitment(
-            recipient, borrowFactor, profitFactor
-        );
+        (
+            uint256 liquiditySupplied,
+            /* uint256 liquidityWeighted */
+        ) = pool.commitments(recipient, LendingTermsLibrary.unsafePack(borrowFactor, profitFactor));
 
-        assertEq(commitment.liquiditySupplied, liquidity);
+        assertEq(liquiditySupplied, liquidity);
     }
 
     function test_fuzz_supply_liquidity_increases_total_liquidity_supplied(
@@ -144,5 +161,71 @@ contract LibraPoolTest is Test {
 
         LendingTermsPacked terms = LendingTermsLibrary.unsafePack(borrowFactor, profitFactor);
         assertEq(pool.supplierBucketBitmap(recipient), 1 << terms.unwrap());
+    }
+    
+    function test_get_seconds_until_auction() external {
+        assertEq(pool.getSecondsUntilAuction(pool.timeAuction()), 0);
+        assertEq(pool.getSecondsUntilAuction(pool.timeAuction() + 1), 0);
+        assertEq(pool.getSecondsUntilAuction(pool.timeAuction() - 1), 1);
+        assertEq(pool.getSecondsUntilAuction(0), pool.timeAuction());
+    }
+
+    function test_get_seconds_until_expiration() external {
+        assertEq(pool.getSecondsUntilExpiration(pool.timeExpires()), 0);
+        assertEq(pool.getSecondsUntilExpiration(pool.timeExpires() + 1), 0);
+        assertEq(pool.getSecondsUntilExpiration(pool.timeExpires() - 1), 1);
+        assertEq(pool.getSecondsUntilExpiration(0), pool.timeExpires());
+    }
+
+    function test_supply_liquidity_reverts_when_borrow_factor_is_invalid() external {
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
+        pool.supplyLiquidity(
+            Q4x4.wrap(type(uint8).max),
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            1,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_liquidity_is_zero() external {
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            0,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_profit_factor_is_invalid() external {
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            Q4x4.wrap(type(uint8).max),
+            1,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_auction_active() external {
+        vm.warp(pool.timeAuction());
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_STATE)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
+            1,
+            address(0xdead)
+        );
+    }
+
+    function test_supply_liquidity_reverts_when_pool_expired() external {
+        vm.warp(pool.timeExpires());
+        vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_STATE)));
+        pool.supplyLiquidity(
+            LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
+            LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
+            1,
+            address(0xdead)
+        );
     }
 }
