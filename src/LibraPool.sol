@@ -178,7 +178,7 @@ contract LibraPool {
 
     /// @notice Borrows liquidity from this pool.
     /// @notice
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero or greater than 4.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero.
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
