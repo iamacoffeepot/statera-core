@@ -340,6 +340,7 @@ contract LibraPool {
     }
 
     /// @notice Supplies liquidity to this pool.
+    /// @notice Liquidity cannot be supplied after the auction has started or when the pool has expired.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
