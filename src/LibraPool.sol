@@ -80,42 +80,6 @@ contract LibraPool {
         asset = vault.asset();
     }
 
-    /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
-    /// @notice This function returns `0` if the auction has already started.
-    function getSecondsUntilAuction(uint256 timestamp) public view returns (uint256) {
-        if (timestamp >= timeAuction) {
-            return 0;
-        }
-
-        unchecked {
-            return timeAuction - timestamp;
-        }
-    }
-
-    /// @notice Returns the number of seconds remaining until the auction starts.
-    /// @notice This function returns `0` if the auction has already started.
-    function getSecondsUntilAuction() public view returns (uint256) {
-        return getSecondsUntilAuction(block.timestamp);
-    }
-
-    /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
-    /// @notice This function returns `0` if this pool has already expired.
-    function getSecondsUntilExpiration(uint256 timestamp) public view returns (uint256) {
-        if (timestamp >= timeExpires) {
-            return 0;
-        }
-
-        unchecked {
-            return timeExpires - timestamp;
-        }
-    }
-
-    /// @notice Returns the number of seconds remaining until this pool expires.
-    /// @notice This function returns `0` if this pool has already expired.
-    function getSecondsUntilExpiration() public view returns (uint256) {
-        return getSecondsUntilExpiration(block.timestamp);
-    }
-
     /// @custom:todo
     function getBucket(
         Q4x4 borrowFactor,
@@ -155,6 +119,42 @@ contract LibraPool {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         return (terms, commitments[supplier][terms]);
+    }
+
+    /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
+    /// @notice This function returns `0` if the auction has already started.
+    function getSecondsUntilAuction(uint256 timestamp) public view returns (uint256) {
+        if (timestamp >= timeAuction) {
+            return 0;
+        }
+
+        unchecked {
+            return timeAuction - timestamp;
+        }
+    }
+
+    /// @notice Returns the number of seconds remaining until the auction starts.
+    /// @notice This function returns `0` if the auction has already started.
+    function getSecondsUntilAuction() public view returns (uint256) {
+        return getSecondsUntilAuction(block.timestamp);
+    }
+
+    /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
+    /// @notice This function returns `0` if this pool has already expired.
+    function getSecondsUntilExpiration(uint256 timestamp) public view returns (uint256) {
+        if (timestamp >= timeExpires) {
+            return 0;
+        }
+
+        unchecked {
+            return timeExpires - timestamp;
+        }
+    }
+
+    /// @notice Returns the number of seconds remaining until this pool expires.
+    /// @notice This function returns `0` if this pool has already expired.
+    function getSecondsUntilExpiration() public view returns (uint256) {
+        return getSecondsUntilExpiration(block.timestamp);
     }
 
     /// @notice Returns the total amount of liquidity supplied by `supplier` across all buckets.
