@@ -121,6 +121,11 @@ contract LibraPool {
         return (terms, commitments[supplier][terms]);
     }
 
+    /// @custom:todo
+    function getLiquidityWeighted(uint256 liquidity) public view returns (uint256 result) {
+        return liquidity * getSecondsUntilAuction();
+    }
+
     /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
     /// @notice This function returns `0` if the auction has already started.
     function getSecondsUntilAuction(uint256 timestamp) public view returns (uint256) {
@@ -364,7 +369,7 @@ contract LibraPool {
             commit.liquiditySupplied += liquidity;
         }
 
-        uint256 liquidityWeighted = liquidity * getSecondsUntilAuction();
+        uint256 liquidityWeighted = getLiquidityWeighted(liquidity);
 
         bucket.liquidityWeighted += liquidityWeighted;
         unchecked {
