@@ -78,6 +78,8 @@ contract LibraPool {
         (timeAuction, timeExpires, vault) = LibraPoolFactory(msg.sender).parameters();
 
         asset = vault.asset();
+
+        require(timeExpires > timeAuction, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
     }
 
     /// @custom:todo
