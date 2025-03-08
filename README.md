@@ -1,8 +1,8 @@
-# libra-kernel
+# statera-kernel
 
 ## Overview
 
-Libra is a decentralized finance protocol that provides users a means to originate fixed-term over-collateralized loans with yield bearing assets. Instead of charging interest during the life of a loan, Libra takes profits  when the loan is closed and distributes them at a prearranged proportion to the borrower and lenders.
+Statera is a decentralized finance protocol that provides users a means to originate fixed-term over-collateralized loans with yield bearing assets. Instead of charging interest during the life of a loan, Libra takes profits  when the loan is closed and distributes them at a prearranged proportion to the borrower and lenders.
 
 ## Organization
 
