@@ -5,8 +5,8 @@ import {Test} from "forge-std/Test.sol";
 import {MockToken} from "./mocks/MockToken.sol";
 import {MockTokenizedVault} from "./mocks/MockTokenizedVault.sol";
 
-import {LibraPool} from "../src/LibraPool.sol";
-import {LibraPoolFactory} from "../src/LibraPoolFactory.sol";
+import {StateraPool} from "../src/StateraPool.sol";
+import {StateraPoolFactory} from "../src/StateraPoolFactory.sol";
 import {Token} from "../src/interfaces/Token.sol";
 import {TokenizedVault} from "../src/interfaces/TokenizedVault.sol";
 import {LendingTermsLibrary} from "../src/libraries/LendingTermsLibrary.sol";
@@ -24,7 +24,7 @@ import {
 contract LibraPoolTest is Test {
     using LendingTermsLibrary for LendingTermsPacked;
 
-    LibraPool public pool;
+    StateraPool public pool;
     Token public asset;
     TokenizedVault public vault;
 
@@ -59,7 +59,7 @@ contract LibraPoolTest is Test {
     function setUp() external {
         vault = new MockTokenizedVault(asset = new MockToken());
 
-        LibraPoolFactory poolFactory = new LibraPoolFactory({
+        StateraPoolFactory poolFactory = new LibraPoolFactory({
             _timeAuction_: block.timestamp + 1 hours,
             _timeExpires_: block.timestamp + 2 hours
         });

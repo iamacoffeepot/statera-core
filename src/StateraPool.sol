@@ -1,6 +1,6 @@
 pragma solidity 0.8.27;
 
-import {LibraPoolFactory} from "./LibraPoolFactory.sol";
+import {StateraPoolFactory} from "./StateraPoolFactory.sol";
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 import {BitMathLibrary} from "./libraries/BitMathLibrary.sol";
@@ -21,7 +21,7 @@ import {
     Q4X4_ONE
 } from "./types/Types.sol";
 
-contract LibraPool {
+contract StateraPool {
     using FixedPointMathLibrary for uint256;
     using LendingTermsLibrary for LendingTerms;
     using LendingTermsLibrary for LendingTermsPacked;
@@ -75,7 +75,7 @@ contract LibraPool {
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
     constructor() {
-        (timeAuction, timeExpires, vault) = LibraPoolFactory(msg.sender).parameters();
+        (timeAuction, timeExpires, vault) = StateraPoolFactory(msg.sender).parameters();
 
         asset = vault.asset();
 
