@@ -42,7 +42,7 @@ contract StateraPoolFactory {
         require(pools[vault] == StateraPool(address(0)), KernelError(KernelErrorType.ILLEGAL_STATE));
 
         parameters = Parameters({timeAuction: timeAuction, timeExpires: timeExpires, vault: vault});
-        StateraPool pool = new LibraPool{salt: keccak256(abi.encode(vault))}();
+        StateraPool pool = new StateraPool{salt: keccak256(abi.encode(vault))}();
         pools[vault] = pool;
 
         delete parameters;

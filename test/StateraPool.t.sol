@@ -59,7 +59,7 @@ contract LibraPoolTest is Test {
     function setUp() external {
         vault = new MockTokenizedVault(asset = new MockToken());
 
-        StateraPoolFactory poolFactory = new LibraPoolFactory({
+        StateraPoolFactory poolFactory = new StateraPoolFactory({
             _timeAuction_: block.timestamp + 1 hours,
             _timeExpires_: block.timestamp + 2 hours
         });
