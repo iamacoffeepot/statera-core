@@ -1,6 +1,6 @@
 pragma solidity 0.8.27;
 
-import {LibraPool} from "./LibraPool.sol";
+import {StateraPool} from "./StateraPool.sol";
 import {Token} from "./interfaces/Token.sol";
 import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 
@@ -10,7 +10,7 @@ import {
     KernelErrorType
 } from "./types/Types.sol";
 
-contract LibraPoolFactory {
+contract StateraPoolFactory {
     /// @notice The time that all pool auctions start at.
     uint256 public immutable timeAuction;
 
@@ -18,7 +18,7 @@ contract LibraPoolFactory {
     uint256 public immutable timeExpires;
 
     /// @custom:todo
-    mapping(TokenizedVault vault => LibraPool pool) public pools;
+    mapping(TokenizedVault vault => StateraPool pool) public pools;
 
     struct Parameters {
         uint256 timeAuction;
@@ -38,11 +38,11 @@ contract LibraPoolFactory {
     /// @notice
     /// - Reverts with an `ILLEGAL_STATE` error if a pool already exists for `vault`.
     /// @param vault The vault to create a pool for.
-    function createPool(TokenizedVault vault) external returns (LibraPool result) {
-        require(pools[vault] == LibraPool(address(0)), KernelError(KernelErrorType.ILLEGAL_STATE));
+    function createPool(TokenizedVault vault) external returns (StateraPool result) {
+        require(pools[vault] == StateraPool(address(0)), KernelError(KernelErrorType.ILLEGAL_STATE));
 
         parameters = Parameters({timeAuction: timeAuction, timeExpires: timeExpires, vault: vault});
-        LibraPool pool = new LibraPool{salt: keccak256(abi.encode(vault))}();
+        StateraPool pool = new LibraPool{salt: keccak256(abi.encode(vault))}();
         pools[vault] = pool;
 
         delete parameters;
