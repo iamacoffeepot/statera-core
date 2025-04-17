@@ -59,6 +59,14 @@ contract StateraPool {
     /// @custom:todo
     uint256 public totalLoans;
 
+    struct Account {
+        uint256 sharesSupplied;
+        uint256 sharesUtilized;
+    }
+
+    /// @custom:todo
+    mapping(address => Account) public accounts;
+
     /// @custom:todo
     mapping(LendingTermsPacked => Bucket) public buckets;
 
@@ -388,4 +396,9 @@ contract StateraPool {
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
     }
+
+    /// @notice Supplies collateral to this pool.
+    /// @param shares The amount of shares to supply as collateral.
+    /// @param recipient The address to supply collateral to.
+    function supplyCollateral(uint256 shares, address recipient) external { }
 }
