@@ -10,6 +10,7 @@ import {MathLibrary} from "./libraries/MathLibrary.sol";
 import {TokenTransferLibrary} from "./libraries/TokenTransferLibrary.sol";
 
 import {
+    Account,
     Bucket,
     Commitment,
     LendingTerms,
@@ -61,11 +62,6 @@ contract StateraPool {
 
     /// @custom:todo
     uint256 public totalSharesSupplied;
-
-    struct Account {
-        uint256 sharesSupplied;
-        uint256 sharesUtilized;
-    }
 
     /// @custom:todo
     mapping(address => Account) public accounts;
