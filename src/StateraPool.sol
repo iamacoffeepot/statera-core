@@ -59,6 +59,9 @@ contract StateraPool {
     /// @custom:todo
     uint256 public totalLoans;
 
+    /// @custom:todo
+    uint256 public totalSharesSupplied;
+
     struct Account {
         uint256 sharesSupplied;
         uint256 sharesUtilized;
@@ -219,11 +222,6 @@ contract StateraPool {
 
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
         require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-
-        require(
-            vault.tryTransferFrom(msg.sender, address(this), shares),
-            KernelError(KernelErrorType.TRANSFER_FAILED)
-        );
 
         unchecked { loanId = totalLoans++; }
 
@@ -400,5 +398,15 @@ contract StateraPool {
     /// @notice Supplies collateral to this pool.
     /// @param shares The amount of shares to supply as collateral.
     /// @param recipient The address to supply collateral to.
-    function supplyCollateral(uint256 shares, address recipient) external { }
+    function supplyCollateral(uint256 shares, address recipient) external {
+        totalSharesSupplied += shares;
+        unchecked {
+            accounts[recipient].sharesSupplied += shares;
+        }
+
+        require(
+            vault.tryTransferFrom(msg.sender, address(this), shares),
+            KernelError(KernelErrorType.TRANSFER_FAILED)
+        );
+    }
 }
