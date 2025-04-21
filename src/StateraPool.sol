@@ -173,25 +173,6 @@ contract StateraPool {
         return getSecondsUntilExpiration(block.timestamp);
     }
 
-    /// @notice Returns the total amount of liquidity supplied by `supplier` across all buckets.
-    function getSupplierTotalLiquidity(address supplier) public view returns (uint256 result) {
-        uint256 bitmap = supplierBucketBitmap[supplier];
-        while (bitmap != 0) {
-            uint8 position = BitMathLibrary.ffs(bitmap);
-
-            // Unchecked addition is safe here because the sum of liquidity supplied is less or equal to the total
-            // which is of the same type.
-            LendingTermsPacked terms = LendingTermsPacked.wrap(position);
-            unchecked {
-                result += commitments[supplier][terms].liquiditySupplied;
-            }
-
-            // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
-            bitmap >>= position;
-            bitmap >>= 1;
-        }
-    }
-
     /// @notice Borrows liquidity from this pool.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `sources.length` is equal to zero.
