@@ -133,7 +133,7 @@ contract StateraPool {
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         return (terms, commitments[supplier][terms]);
     }
-    
+
     /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan during
     /// the auction period respective to `timestamp`.
     function getLiquidationFactor(uint256 timestamp) public view returns (uint256 result) { }
@@ -150,7 +150,6 @@ contract StateraPool {
     }
 
     /// @notice Returns the number of seconds remaining until the auction starts respective to `timestamp`.
-    /// @notice This function returns `0` if the auction has already started.
     function getSecondsUntilAuction(uint256 timestamp) public view returns (uint256) {
         if (timestamp >= timeAuction) {
             return 0;
@@ -168,7 +167,6 @@ contract StateraPool {
     }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
-    /// @notice This function returns `0` if this pool has already expired.
     function getSecondsUntilExpiration(uint256 timestamp) public view returns (uint256) {
         if (timestamp >= timeExpires) {
             return 0;
