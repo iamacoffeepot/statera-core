@@ -345,6 +345,25 @@ contract StateraPool {
         );
     }
 
+    /// @notice Supplies collateral to this pool.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// @param shares The amount of shares to supply as collateral.
+    /// @param recipient The address to supply collateral to.
+    function supplyCollateral(uint256 shares, address recipient) external {
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
+        totalSharesSupplied += shares;
+        unchecked {
+            sharesSupplied[recipient] += shares;
+        }
+
+        require(
+            vault.tryTransferFrom(msg.sender, address(this), shares),
+            KernelError(KernelErrorType.TRANSFER_FAILED)
+        );
+    }
+
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied after the auction has started or when the pool has expired.
     /// @notice
@@ -391,25 +410,6 @@ contract StateraPool {
         );
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
-    }
-
-    /// @notice Supplies collateral to this pool.
-    /// @notice
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
-    /// @param shares The amount of shares to supply as collateral.
-    /// @param recipient The address to supply collateral to.
-    function supplyCollateral(uint256 shares, address recipient) external {
-        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-
-        totalSharesSupplied += shares;
-        unchecked {
-            sharesSupplied[recipient] += shares;
-        }
-
-        require(
-            vault.tryTransferFrom(msg.sender, address(this), shares),
-            KernelError(KernelErrorType.TRANSFER_FAILED)
-        );
     }
 
     /// @notice Withdraws collateral from this pool.
