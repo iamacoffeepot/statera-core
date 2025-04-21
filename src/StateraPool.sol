@@ -60,7 +60,7 @@ contract StateraPool {
     uint256 public totalLoans;
 
     /// @custom:todo
-    /// @custom:invariant `totalSharesSupplied >= ΣsharesSupplied`
+    /// @custom:invariant `totalSharesSupplied >= sum(sharesSupplied)`
     uint256 public totalSharesSupplied;
 
     /// @custom:todo
