@@ -199,12 +199,10 @@ contract StateraPool {
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has started.
-    /// - Reverts with an `TRANSFER_FAILED` error if the shares fail to transfer.
     /// - Reverts with an `TRANSFER_FAILED` error if the assets fail to transfer.
     /// - Reverts with an `INSUFFICIENT_LIQUIDITY` error if the specified buckets do not contain enough liquidity
     /// to fulfill the request.
-    /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of supplied shares is not enough to collateralize
-    /// the loan.
+    /// - Reverts with an `INSUFFICIENT_COLLATERAL` error if value of `shares` is not enough to collateralize the loan.
     /// @param sources TODO
     /// @param liquidity The amount of liquidity to borrow.
     /// @param shares The amount of shares to supply as collateral.
@@ -416,7 +414,7 @@ contract StateraPool {
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// @param shares The amount of shares to withdraw.
-    /// @param recipient The address to withdraw to.
+    /// @param recipient The address to withdraw collateral to.
     function withdrawCollateral(uint256 shares, address recipient) external {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
