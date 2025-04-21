@@ -75,6 +75,7 @@ contract StateraPool {
     mapping(uint256 id => mapping(LendingTermsPacked => uint256 liquidity)) public loanChunks;
 
     /// @custom:todo
+    /// @custom:invariant `∀x(sharesSupplied[x] > sharesUtilized[x])`
     mapping(address => uint256 shares) public sharesSupplied;
 
     /// @custom:todo
