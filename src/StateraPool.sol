@@ -201,6 +201,9 @@ contract StateraPool {
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
         require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
+        uint256 sharesFree = sharesSupplied[msg.sender] - sharesUtilized[msg.sender];
+        require(sharesFree >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+
         unchecked { loanId = totalLoans++; }
 
         Loan memory loan;
@@ -254,6 +257,10 @@ contract StateraPool {
 
         uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValue, loan.borrowFactor);
         require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
+
+        unchecked {
+            sharesUtilized[msg.sender] += shares;
+        }
 
         loans[loanId] = loan;
 
