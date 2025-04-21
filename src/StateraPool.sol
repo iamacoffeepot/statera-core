@@ -408,7 +408,7 @@ contract StateraPool {
 
     /// @notice Withdraws collateral from this pool.
     /// @param shares The amount of shares to withdraw.
-    /// @param recipient The address to withdraw the shares to.
+    /// @param recipient The address to withdraw to.
     function withdrawCollateral(uint256 shares, address recipient) external {
         Account storage account = accounts[msg.sender];
 
