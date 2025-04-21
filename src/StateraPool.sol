@@ -10,7 +10,6 @@ import {MathLibrary} from "./libraries/MathLibrary.sol";
 import {TokenTransferLibrary} from "./libraries/TokenTransferLibrary.sol";
 
 import {
-    Account,
     Bucket,
     Commitment,
     LendingTerms,
@@ -64,9 +63,6 @@ contract StateraPool {
     uint256 public totalSharesSupplied;
 
     /// @custom:todo
-    mapping(address => Account) public accounts;
-
-    /// @custom:todo
     mapping(LendingTermsPacked => Bucket) public buckets;
 
     /// @custom:todo
@@ -77,6 +73,12 @@ contract StateraPool {
 
     /// @custom:todo
     mapping(uint256 id => mapping(LendingTermsPacked => uint256 liquidity)) public loanChunks;
+
+    /// @custom:todo
+    mapping(address => uint256 shares) public sharesSupplied;
+
+    /// @custom:todo
+    mapping(address => uint256 shares) public sharesUtilized;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
@@ -401,7 +403,7 @@ contract StateraPool {
 
         totalSharesSupplied += shares;
         unchecked {
-            accounts[recipient].sharesSupplied += shares;
+            sharesSupplied[recipient] += shares;
         }
 
         require(
@@ -418,12 +420,10 @@ contract StateraPool {
     function withdrawCollateral(uint256 shares, address recipient) external {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
-        Account storage account = accounts[msg.sender];
-
-        uint256 sharesFree = account.sharesSupplied - account.sharesUtilized;
+        uint256 sharesFree = sharesSupplied[msg.sender] - sharesUtilized[msg.sender];
         require(sharesFree >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
-        account.sharesSupplied -= shares;
+        sharesSupplied[msg.sender] -= shares;
         unchecked {
             totalSharesSupplied -= shares;
         }

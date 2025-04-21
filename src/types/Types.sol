@@ -1,6 +1,5 @@
 pragma solidity 0.8.27;
 
-import {Account} from "./Account.sol";
 import {Bucket} from "./Bucket.sol";
 import {Commitment} from "./Commitment.sol";
 import {KernelError, KernelErrorType} from "./KernelError.sol";
