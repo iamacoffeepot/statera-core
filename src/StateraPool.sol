@@ -260,7 +260,7 @@ contract StateraPool {
         }
 
         uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValue, loan.borrowFactor);
-        require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
+        require(liquidityBorrowable >= loan.liquidityBorrowed, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
 
         unchecked {
             sharesAssigned[msg.sender] += shares;
