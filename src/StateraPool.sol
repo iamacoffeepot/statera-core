@@ -133,6 +133,16 @@ contract StateraPool {
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         return (terms, commitments[supplier][terms]);
     }
+    
+    /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan during
+    /// the auction period respective to `timestamp`.
+    function getLiquidationFactor(uint256 timestamp) public view returns (uint256 result) { }
+
+    /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan.
+    /// @notice This function returns `0` if the auction has not started.
+    function getLiquidationFactor() public view returns (uint256) {
+        return getLiquidationFactor(block.timestamp);
+    }
 
     /// @custom:todo
     function getLiquidityWeighted(uint256 liquidity) public view returns (uint256 result) {
