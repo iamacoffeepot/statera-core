@@ -392,9 +392,13 @@ contract StateraPool {
     }
 
     /// @notice Supplies collateral to this pool.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// @param shares The amount of shares to supply as collateral.
     /// @param recipient The address to supply collateral to.
     function supplyCollateral(uint256 shares, address recipient) external {
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
         totalSharesSupplied += shares;
         unchecked {
             accounts[recipient].sharesSupplied += shares;
@@ -407,9 +411,13 @@ contract StateraPool {
     }
 
     /// @notice Withdraws collateral from this pool.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// @param shares The amount of shares to withdraw.
     /// @param recipient The address to withdraw to.
     function withdrawCollateral(uint256 shares, address recipient) external {
+        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+
         Account storage account = accounts[msg.sender];
 
         uint256 sharesFree = account.sharesSupplied - account.sharesUtilized;
