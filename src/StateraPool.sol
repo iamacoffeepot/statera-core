@@ -402,8 +402,8 @@ contract StateraPool {
         uint256 sharesFree = sharesSupplied[msg.sender] - sharesUtilized[msg.sender];
         require(sharesFree >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
-        sharesSupplied[msg.sender] -= shares;
         unchecked {
+            sharesSupplied[msg.sender] -= shares;
             totalSharesSupplied -= shares;
         }
 
