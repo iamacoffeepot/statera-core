@@ -405,4 +405,21 @@ contract StateraPool {
             KernelError(KernelErrorType.TRANSFER_FAILED)
         );
     }
+
+    /// @notice Withdraws collateral from this pool.
+    /// @param shares The amount of shares to withdraw.
+    /// @param recipient The address to withdraw the shares to.
+    function withdrawCollateral(uint256 shares, address recipient) external {
+        Account storage account = accounts[msg.sender];
+
+        uint256 sharesFree = account.sharesSupplied - account.sharesUtilized;
+        require(sharesFree >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+
+        account.sharesSupplied -= shares;
+        unchecked {
+            totalSharesSupplied -= shares;
+        }
+
+        require(vault.tryTransfer(recipient, shares), KernelError(KernelErrorType.TRANSFER_FAILED));
+    }
 }
