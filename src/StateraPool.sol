@@ -201,7 +201,10 @@ contract StateraPool {
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
         require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
-        uint256 sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+        uint256 sharesAvailable;
+        unchecked {
+            sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+        }
         require(sharesAvailable >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked { loanId = totalLoans++; }
@@ -411,7 +414,10 @@ contract StateraPool {
     function withdrawCollateral(uint256 shares, address recipient) external {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
-        uint256 sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+        uint256 sharesAvailable;
+        unchecked {
+            sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+        }
         require(sharesAvailable >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked {
