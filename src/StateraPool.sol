@@ -79,7 +79,7 @@ contract StateraPool {
     mapping(address => uint256 shares) public sharesSupplied;
 
     /// @custom:todo
-    mapping(address => uint256 shares) public sharesUtilized;
+    mapping(address => uint256 shares) public sharesAssigned;
 
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
@@ -201,8 +201,8 @@ contract StateraPool {
         require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
         require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
 
-        uint256 sharesFree = sharesSupplied[msg.sender] - sharesUtilized[msg.sender];
-        require(sharesFree >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+        uint256 sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+        require(sharesAvailable >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked { loanId = totalLoans++; }
 
@@ -259,7 +259,7 @@ contract StateraPool {
         require(loan.liquidityBorrowed <= liquidityBorrowable, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
 
         unchecked {
-            sharesUtilized[msg.sender] += shares;
+            sharesAssigned[msg.sender] += shares;
         }
 
         loans[loanId] = loan;
@@ -327,7 +327,7 @@ contract StateraPool {
         }
 
         unchecked {
-            sharesUtilized[msg.sender] -= loan.sharesSupplied;
+            sharesAssigned[msg.sender] -= loan.sharesSupplied;
         }
 
         require(
@@ -411,8 +411,8 @@ contract StateraPool {
     function withdrawCollateral(uint256 shares, address recipient) external {
         require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
 
-        uint256 sharesFree = sharesSupplied[msg.sender] - sharesUtilized[msg.sender];
-        require(sharesFree >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+        uint256 sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+        require(sharesAvailable >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked {
             sharesSupplied[msg.sender] -= shares;
