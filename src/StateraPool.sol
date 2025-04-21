@@ -326,6 +326,10 @@ contract StateraPool {
             bitmap >>= 1;
         }
 
+        unchecked {
+            sharesUtilized[msg.sender] -= loan.sharesSupplied;
+        }
+
         require(
             asset.tryTransferFrom(msg.sender, address(this), loan.liquidityBorrowed + profitSuppliers),
             KernelError(KernelErrorType.TRANSFER_FAILED)
