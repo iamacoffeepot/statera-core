@@ -93,15 +93,6 @@ contract StateraPool {
         require(timeExpires > timeAuction, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
     }
 
-    /// @custom:todo
-    function getBucket(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
-    ) public view returns (LendingTermsPacked terms, Bucket memory bucket) {
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
-        return (terms, bucket);
-    }
-
     /// @notice Returns a storage pointer to the bucket associated with the given lending terms
     /// (`borrowFactor` and `profitFactor`).
     function getBucketPointer(
@@ -111,16 +102,6 @@ contract StateraPool {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
         return (terms, buckets[terms]);
-    }
-
-    /// @custom:todo
-    function getCommitment(
-        address supplier,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
-    ) public view returns (LendingTermsPacked terms, Commitment memory commitment) {
-        (LendingTermsPacked terms, Commitment storage commitment) = getCommitmentPointer(supplier, borrowFactor, profitFactor);
-        return (terms, commitment);
     }
 
     /// @custom:todo
