@@ -28,6 +28,13 @@ contract StateraPool {
     using TokenTransferLibrary for Token;
     using TokenTransferLibrary for TokenizedVault;
 
+    /// @custom:todo Are parameters properly indexed?
+    event SupplyCollateral(
+        address indexed sender,
+        uint256 shares,
+        address indexed recipient
+    );
+
     // @custom:todo Are parameters properly indexed?
     event SupplyLiquidity(
         address indexed sender,
@@ -347,6 +354,8 @@ contract StateraPool {
             vault.tryTransferFrom(msg.sender, address(this), shares),
             KernelError(KernelErrorType.TRANSFER_FAILED)
         );
+
+        emit SupplyCollateral(msg.sender, shares, recipient);
     }
 
     /// @notice Supplies liquidity to this pool.
