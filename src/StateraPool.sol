@@ -44,6 +44,13 @@ contract StateraPool {
         address indexed recipient
     );
 
+    /// @custom:todo Are parameters properly indexed?
+    event WithdrawCollateral(
+        address indexed sender,
+        uint256 shares,
+        address indexed recipient
+    );
+
     /// @notice The underlying token that `vault` uses for accounting, depositing, and withdrawing.
     Token immutable public asset;
 
@@ -427,5 +434,7 @@ contract StateraPool {
         }
 
         require(vault.tryTransfer(recipient, shares), KernelError(KernelErrorType.TRANSFER_FAILED));
+
+        emit WithdrawCollateral(msg.sender, shares, recipient);
     }
 }
