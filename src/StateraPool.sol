@@ -351,6 +351,7 @@ contract StateraPool {
     /// @notice Supplies collateral to this pool.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// - Reverts with an `TRANSFER_FAILED` error if transferring the shares to this pool fails.
     /// @param shares The amount of shares to supply as collateral.
     /// @param recipient The address to supply collateral to.
     function supplyCollateral(uint256 shares, address recipient) external {
@@ -418,6 +419,7 @@ contract StateraPool {
     /// @notice Withdraws collateral from this pool.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// - Reverts with an `TRANSFER_FAILED` error if transferring the shares to `recipient` fails.
     /// @param shares The amount of shares to withdraw.
     /// @param recipient The address to withdraw collateral to.
     function withdrawCollateral(uint256 shares, address recipient) external {
