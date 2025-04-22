@@ -167,7 +167,7 @@ contract StateraPool {
     }
 
     /// @notice Returns the number of seconds remaining until this pool expires respective to `timestamp`.
-    function getSecondsUntilExpiration(uint256 timestamp) public view returns (uint256) {
+    function getSecondsUntilExpiration(uint256 timestamp) public view returns (uint256 result) {
         if (timestamp >= timeExpires) {
             return 0;
         }
