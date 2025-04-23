@@ -8,8 +8,11 @@ type Q4x4 is uint8;
 /// @dev Alias of `type(uint8).max` for use in inline assembly.
 uint256 constant UINT8_MAXIMUM = 0xff;
 
+/// @custom:todo
+uint8 constant Q4X4_SCALING_FACTOR = 1 << 4;
+
 /// @dev The numerical representation of one for a `Q4x4`.
-Q4x4 constant Q4X4_ONE = Q4x4.wrap(1 << 4);
+Q4x4 constant Q4X4_ONE = Q4x4.wrap(Q4X4_SCALING_FACTOR);
 
 using {
     Q4x4IsEqualTo              as ==,
