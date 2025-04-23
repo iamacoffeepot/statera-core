@@ -6,3 +6,4 @@ import {KernelError, KernelErrorType} from "./KernelError.sol";
 import {LendingTerms, LendingTermsPacked} from "./LendingTerms.sol";
 import {Loan} from "./Loan.sol";
 import {Q4x4, Q4X4_ONE} from "./fixed/Q4x4.sol";
+import {S18} from "./fixed/S18.sol";
