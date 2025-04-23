@@ -18,7 +18,8 @@ import {
     KernelError,
     KernelErrorType,
     Q4x4,
-    Q4X4_ONE
+    Q4X4_ONE,
+    S18
 } from "./types/Types.sol";
 
 contract StateraPool {
@@ -131,11 +132,23 @@ contract StateraPool {
 
     /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan during
     /// the auction period respective to `timestamp`.
-    function getLiquidationFactor(uint256 timestamp) public view returns (uint256 result) { }
+    function getLiquidationFactor(uint256 timestamp) public view returns (S18 result) {
+        if (timestamp <= timeAuction) {
+            return S18.wrap(0);
+        }
+
+        if (timestamp >= timeExpires) {
+            return S18.wrap(1e18);
+        }
+
+        unchecked {
+            return FixedPointMathLibrary.toS18(timestamp - timeAuction, timeExpires - timeAuction);
+        }
+    }
 
     /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan.
     /// @notice This function returns `0` if the auction has not started.
-    function getLiquidationFactor() public view returns (uint256) {
+    function getLiquidationFactor() public view returns (S18) {
         return getLiquidationFactor(block.timestamp);
     }
 
