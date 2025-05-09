@@ -1,13 +1,13 @@
 pragma solidity 0.8.27;
 
-import {Q4x4} from "./fixed/Q4x4.sol";
+import {UQ4x4} from "./fixed/UQ4x4.sol";
 
 /// @dev Alias of `type(uint8).max` for use in inline assembly.
 uint256 constant UINT8_MAXIMUM = 0xff;
 
 struct LendingTerms {
-    Q4x4 borrowFactor;
-    Q4x4 profitFactor;
+    UQ4x4 borrowFactor;
+    UQ4x4 profitFactor;
 }
 
 /// @notice A compact representation of `LendingTerms`. The 4 least significant bits correspond to the fractional

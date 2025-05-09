@@ -17,9 +17,8 @@ import {
     Loan,
     KernelError,
     KernelErrorType,
-    Q4x4,
-    Q4X4_ONE,
-    S18
+    UQ4x4,
+    UQ4X4_ONE
 } from "./types/Types.sol";
 
 contract StateraPool {
@@ -39,8 +38,8 @@ contract StateraPool {
     // @custom:todo Are parameters properly indexed?
     event SupplyLiquidity(
         address indexed sender,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity,
         address indexed recipient
     );
@@ -111,8 +110,8 @@ contract StateraPool {
     /// @notice Returns a storage pointer to the bucket associated with the given lending terms
     /// (`borrowFactor` and `profitFactor`).
     function getBucketPointer(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor
     ) internal view returns (LendingTermsPacked terms, Bucket storage bucket) {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
@@ -122,8 +121,8 @@ contract StateraPool {
     /// @custom:todo
     function getCommitmentPointer(
         address supplier,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor
     ) internal view returns (LendingTermsPacked terms, Commitment storage commitment) {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
@@ -132,23 +131,11 @@ contract StateraPool {
 
     /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan during
     /// the auction period respective to `timestamp`.
-    function getLiquidationFactor(uint256 timestamp) public view returns (S18 result) {
-        if (timestamp <= timeAuction) {
-            return S18.wrap(0);
-        }
-
-        if (timestamp >= timeExpires) {
-            return S18.wrap(1e18);
-        }
-
-        unchecked {
-            return FixedPointMathLibrary.toS18(timestamp - timeAuction, timeExpires - timeAuction);
-        }
-    }
+    function getLiquidationFactor(uint256 timestamp) public view returns (uint256 result) { }
 
     /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan.
     /// @notice This function returns `0` if the auction has not started.
-    function getLiquidationFactor() public view returns (S18) {
+    function getLiquidationFactor() public view returns (uint256 result) {
         return getLiquidationFactor(block.timestamp);
     }
 
@@ -275,7 +262,7 @@ contract StateraPool {
             }
         }
 
-        uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByQ4x4(loan.sharesValue, loan.borrowFactor);
+        uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByUQ4x4(loan.sharesValue, loan.borrowFactor);
         require(liquidityBorrowable >= loan.liquidityBorrowed, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
 
         unchecked {
@@ -327,11 +314,11 @@ contract StateraPool {
             }
 
             if (profitTotal > 0) {
-                (/* Q4x4 borrowFactor */, Q4x4 profitFactor) = LendingTermsLibrary.unpack(terms);
+                (/* Q4x4 borrowFactor */, UQ4x4 profitFactor) = LendingTermsLibrary.unpack(terms);
 
-                uint256 profitBucket = FixedPointMathLibrary.multiplyByQ4x4(
+                uint256 profitBucket = FixedPointMathLibrary.multiplyByUQ4x4(
                     MathLibrary.mulDiv(profitTotal, liquidityChunk, loan.liquidityBorrowed),
-                    Q4X4_ONE - profitFactor
+                    UQ4X4_ONE - profitFactor
                 );
 
                 buckets[terms].supplierProfitsRealized += profitBucket;
@@ -390,8 +377,8 @@ contract StateraPool {
     /// @param liquidity The amount of liquidity to supply.
     /// @param recipient The address to supply liquidity to.
     function supplyLiquidity(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external {

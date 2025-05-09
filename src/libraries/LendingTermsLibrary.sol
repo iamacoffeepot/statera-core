@@ -3,38 +3,38 @@ pragma solidity 0.8.27;
 import {
     LendingTerms,
     LendingTermsPacked,
-    Q4x4
+    UQ4x4
 } from "../types/Types.sol";
 
 /// @notice TODO
 library LendingTermsLibrary {
     /// @notice The minimum accepted borrow factor.
-    Q4x4 public constant BORROW_FACTOR_MINIMUM = Q4x4.wrap(1);
+    UQ4x4 public constant BORROW_FACTOR_MINIMUM = UQ4x4.wrap(1);
 
     /// @notice The minimum accepted profit factor.
-    Q4x4 public constant PROFIT_FACTOR_MINIMUM = Q4x4.wrap(1);
+    UQ4x4 public constant PROFIT_FACTOR_MINIMUM = UQ4x4.wrap(1);
 
     /// @notice The maximum accepted borrow factor.
-    Q4x4 public constant BORROW_FACTOR_MAXIMUM = Q4x4.wrap((1 << 4) - 1);
+    UQ4x4 public constant BORROW_FACTOR_MAXIMUM = UQ4x4.wrap((1 << 4) - 1);
 
     /// @notice The maximum accepted profit factor.
-    Q4x4 public constant PROFIT_FACTOR_MAXIMUM = Q4x4.wrap((1 << 4) - 1);
+    UQ4x4 public constant PROFIT_FACTOR_MAXIMUM = UQ4x4.wrap((1 << 4) - 1);
 
     /// @notice Returns `true` if `borrowFactor` is in the accepted range.
-    function isValidBorrowFactor(Q4x4 borrowFactor) internal pure returns (bool valid) {
+    function isValidBorrowFactor(UQ4x4 borrowFactor) internal pure returns (bool valid) {
         valid = borrowFactor >= BORROW_FACTOR_MINIMUM && borrowFactor <= BORROW_FACTOR_MAXIMUM;
     }
 
     /// @notice Returns `true` if `profitFactor` is in the accepted range.
-    function isValidProfitFactor(Q4x4 profitFactor) internal pure returns (bool valid) {
+    function isValidProfitFactor(UQ4x4 profitFactor) internal pure returns (bool valid) {
         valid = profitFactor >= PROFIT_FACTOR_MINIMUM && profitFactor <= PROFIT_FACTOR_MAXIMUM;
     }
 
     /// @notice Tries to pack lending terms into an integer.
     /// @notice `result` should be considered undefined when `success` is `false`.
     function tryPack(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor
     ) internal pure returns (LendingTermsPacked result, bool success) {
         success = true;
 
@@ -52,11 +52,11 @@ library LendingTermsLibrary {
 
     /// @notice Packs lending terms into an integer without checking if the terms are valid.
     function unsafePack(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor
     ) internal pure returns (LendingTermsPacked result) {
-        uint8 x = Q4x4.unwrap(borrowFactor);
-        uint8 y = Q4x4.unwrap(profitFactor);
+        uint8 x = UQ4x4.unwrap(borrowFactor);
+        uint8 y = UQ4x4.unwrap(profitFactor);
 
         result = LendingTermsPacked.wrap(x << 4 | y);
     }
@@ -67,11 +67,11 @@ library LendingTermsLibrary {
     }
 
     /// @notice Unpacks `packed` into lending terms.
-    function unpack(LendingTermsPacked packed) internal pure returns (Q4x4 borrowFactor, Q4x4 profitFactor) {
+    function unpack(LendingTermsPacked packed) internal pure returns (UQ4x4 borrowFactor, UQ4x4 profitFactor) {
         uint8 unwrapped = LendingTermsPacked.unwrap(packed);
 
-        borrowFactor = Q4x4.wrap(unwrapped >> 4);
-        profitFactor = Q4x4.wrap(unwrapped & 0xf);
+        borrowFactor = UQ4x4.wrap(unwrapped >> 4);
+        profitFactor = UQ4x4.wrap(unwrapped & 0xf);
     }
 
     /// @custom:todo

@@ -18,7 +18,7 @@ import {
     KernelError,
     KernelErrorType,
     LendingTermsPacked,
-    Q4x4
+UQ4x4
 } from "../src/types/Types.sol";
 
 contract LibraPoolTest is Test {
@@ -40,8 +40,8 @@ contract LibraPoolTest is Test {
     }
 
     modifier validatesSupplyLiquidityArguments(
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity
     ) {
         vm.assume(LendingTermsLibrary.isValidBorrowFactor(borrowFactor));
@@ -68,8 +68,8 @@ contract LibraPoolTest is Test {
 
     function test_fuzz_supply_liquidity_increases_supplied_of_bucket(
         address caller,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
@@ -92,8 +92,8 @@ contract LibraPoolTest is Test {
 
     function test_fuzz_supply_liquidity_increases_supplied_of_recipient(
         address caller,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
@@ -114,8 +114,8 @@ contract LibraPoolTest is Test {
 
     function test_fuzz_supply_liquidity_increases_total_liquidity_supplied(
         address caller,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
@@ -130,8 +130,8 @@ contract LibraPoolTest is Test {
 
     function test_fuzz_supply_liquidity_transfers_assets_from_caller(
         address caller,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
@@ -147,8 +147,8 @@ contract LibraPoolTest is Test {
 
     function test_fuzz_supply_liquidity_updates_recipient_bucket_bitmap(
         address caller,
-        Q4x4 borrowFactor,
-        Q4x4 profitFactor,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
@@ -180,7 +180,7 @@ contract LibraPoolTest is Test {
     function test_supply_liquidity_reverts_when_borrow_factor_is_invalid() external {
         vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
         pool.supplyLiquidity(
-            Q4x4.wrap(type(uint8).max),
+            UQ4x4.wrap(type(uint8).max),
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             1,
             address(0xdead)
@@ -201,7 +201,7 @@ contract LibraPoolTest is Test {
         vm.expectRevert(abi.encodeWithSelector(KernelError.selector, (KernelErrorType.ILLEGAL_ARGUMENT)));
         pool.supplyLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
-            Q4x4.wrap(type(uint8).max),
+            UQ4x4.wrap(type(uint8).max),
             1,
             address(0xdead)
         );
