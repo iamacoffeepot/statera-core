@@ -372,6 +372,31 @@ contract StateraPool {
         emit SupplyCollateral(msg.sender, shares, recipient);
     }
 
+    /// @notice Withdraws collateral from this pool.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
+    /// - Reverts with an `TRANSFER_FAILED` error if transferring the shares to `recipient` fails.
+    /// @param shares The amount of shares to withdraw.
+    /// @param recipient The address to withdraw collateral to.
+    function withdrawCollateral(uint256 shares, address recipient) external {
+        require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+
+        uint256 sharesAvailable;
+        unchecked {
+            sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+        }
+        require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+
+        unchecked {
+            sharesSupplied[msg.sender] -= shares;
+            totalSharesSupplied -= shares;
+        }
+
+        require(vault.tryTransfer(recipient, shares), CoreError(CoreErrorType.TRANSFER_FAILED));
+
+        emit WithdrawCollateral(msg.sender, shares, recipient);
+    }
+
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied after the auction has started or when the pool has expired.
     /// @notice
@@ -418,30 +443,5 @@ contract StateraPool {
         );
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
-    }
-
-    /// @notice Withdraws collateral from this pool.
-    /// @notice
-    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
-    /// - Reverts with an `TRANSFER_FAILED` error if transferring the shares to `recipient` fails.
-    /// @param shares The amount of shares to withdraw.
-    /// @param recipient The address to withdraw collateral to.
-    function withdrawCollateral(uint256 shares, address recipient) external {
-        require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
-
-        uint256 sharesAvailable;
-        unchecked {
-            sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
-        }
-        require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
-
-        unchecked {
-            sharesSupplied[msg.sender] -= shares;
-            totalSharesSupplied -= shares;
-        }
-
-        require(vault.tryTransfer(recipient, shares), CoreError(CoreErrorType.TRANSFER_FAILED));
-
-        emit WithdrawCollateral(msg.sender, shares, recipient);
     }
 }
