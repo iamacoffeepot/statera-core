@@ -383,7 +383,7 @@ contract StateraPool {
     /// @param profitFactor The proportion of profits that will be allocated to the borrower.
     /// @param liquidity The amount of liquidity to supply.
     /// @param recipient The address to supply liquidity to.
-    function supplyLiquidity(
+    function DEPRECATED_supplyLiquidity(
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
         uint256 liquidity,

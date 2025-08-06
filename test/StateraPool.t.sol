@@ -78,7 +78,7 @@ contract LibraPoolTest is Test {
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
         (
             /* uint256 liquidityBorrowed */,
@@ -102,7 +102,7 @@ contract LibraPoolTest is Test {
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
         (
             uint256 liquiditySupplied,
@@ -124,7 +124,7 @@ contract LibraPoolTest is Test {
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
         assertEq(pool.totalLiquiditySupplied(), liquidity);
     }
 
@@ -140,7 +140,7 @@ contract LibraPoolTest is Test {
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
         assertEq(asset.balanceOf(address(pool)), liquidity);
         assertEq(asset.balanceOf(address(caller)), 0);
     }
@@ -157,7 +157,7 @@ contract LibraPoolTest is Test {
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
         LendingTermsPacked terms = LendingTermsLibrary.unsafePack(borrowFactor, profitFactor);
         assertEq(pool.supplierBucketBitmap(recipient), 1 << terms.unwrap());
@@ -179,7 +179,7 @@ contract LibraPoolTest is Test {
 
     function test_supply_liquidity_reverts_when_borrow_factor_is_invalid() external {
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_ARGUMENT)));
-        pool.supplyLiquidity(
+        pool.DEPRECATED_supplyLiquidity(
             UQ4x4.wrap(type(uint8).max),
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             1,
@@ -189,7 +189,7 @@ contract LibraPoolTest is Test {
 
     function test_supply_liquidity_reverts_when_liquidity_is_zero() external {
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_ARGUMENT)));
-        pool.supplyLiquidity(
+        pool.DEPRECATED_supplyLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             0,
@@ -199,7 +199,7 @@ contract LibraPoolTest is Test {
 
     function test_supply_liquidity_reverts_when_profit_factor_is_invalid() external {
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_ARGUMENT)));
-        pool.supplyLiquidity(
+        pool.DEPRECATED_supplyLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             UQ4x4.wrap(type(uint8).max),
             1,
@@ -210,7 +210,7 @@ contract LibraPoolTest is Test {
     function test_supply_liquidity_reverts_when_auction_active() external {
         vm.warp(pool.timeAuction());
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_STATE)));
-        pool.supplyLiquidity(
+        pool.DEPRECATED_supplyLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
             1,
@@ -221,7 +221,7 @@ contract LibraPoolTest is Test {
     function test_supply_liquidity_reverts_when_pool_expired() external {
         vm.warp(pool.timeExpires());
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_STATE)));
-        pool.supplyLiquidity(
+        pool.DEPRECATED_supplyLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
             1,
