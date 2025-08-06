@@ -277,6 +277,13 @@ contract StateraPool {
         );
     }
 
+    /// @custom:todo
+    function commitLiquidity(
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
+        uint256 liquidity
+    ) external { }
+
     /// @notice Repays liquidity to this pool.
     /// @notice
     /// - Reverts with an `ILLEGAL_STATE` error if the pool has expired.
