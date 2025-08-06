@@ -1,4 +1,4 @@
-# statera-kernel
+# statera-core
 
 ## Overview
 

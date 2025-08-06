@@ -1,6 +1,6 @@
 pragma solidity 0.8.27;
 
-import {KernelError, KernelErrorType} from "../KernelError.sol";
+import {CoreError, CoreErrorType} from "../CoreError.sol";
 
 /// @notice An unsigned binary fixed point number with 4 integer bits and 4 fraction bits.
 type UQ4x4 is uint8;
@@ -63,7 +63,7 @@ function UQ4x4Subtract(UQ4x4 x, UQ4x4 y) pure returns (UQ4x4 result) {
     uint256 u = UQ4x4.unwrap(x);
     uint256 v = UQ4x4.unwrap(y);
 
-    require(v > u, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+    require(v > u, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
     assembly { result := sub(u, v) }
 }

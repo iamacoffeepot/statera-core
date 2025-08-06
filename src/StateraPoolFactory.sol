@@ -6,8 +6,8 @@ import {TokenizedVault} from "./interfaces/TokenizedVault.sol";
 
 
 import {
-    KernelError,
-    KernelErrorType
+    CoreError,
+    CoreErrorType
 } from "./types/Types.sol";
 
 contract StateraPoolFactory {
@@ -39,7 +39,7 @@ contract StateraPoolFactory {
     /// - Reverts with an `ILLEGAL_STATE` error if a pool already exists for `vault`.
     /// @param vault The vault to create a pool for.
     function createPool(TokenizedVault vault) external returns (StateraPool result) {
-        require(pools[vault] == StateraPool(address(0)), KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(pools[vault] == StateraPool(address(0)), CoreError(CoreErrorType.ILLEGAL_STATE));
 
         parameters = Parameters({timeAuction: timeAuction, timeExpires: timeExpires, vault: vault});
         StateraPool pool = new StateraPool{salt: keccak256(abi.encode(vault))}();

@@ -1,8 +1,8 @@
 pragma solidity 0.8.27;
 
-error KernelError(KernelErrorType);
+error CoreError(CoreErrorType);
 
-enum KernelErrorType {
+enum CoreErrorType {
     ILLEGAL_ARGUMENT,
     ILLEGAL_STATE,
     INSUFFICIENT_COLLATERAL,

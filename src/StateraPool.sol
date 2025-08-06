@@ -15,8 +15,8 @@ import {
     LendingTerms,
     LendingTermsPacked,
     Loan,
-    KernelError,
-    KernelErrorType,
+    CoreError,
+    CoreErrorType,
     UQ4x4,
     UQ4X4_ONE
 } from "./types/Types.sol";
@@ -104,7 +104,7 @@ contract StateraPool {
 
         asset = vault.asset();
 
-        require(timeExpires > timeAuction, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(timeExpires > timeAuction, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
     }
 
     /// @notice Returns a storage pointer to the bucket associated with the given lending terms
@@ -114,7 +114,7 @@ contract StateraPool {
         UQ4x4 profitFactor
     ) internal view returns (LendingTermsPacked terms, Bucket storage bucket) {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
         return (terms, buckets[terms]);
     }
 
@@ -125,7 +125,7 @@ contract StateraPool {
         UQ4x4 profitFactor
     ) internal view returns (LendingTermsPacked terms, Commitment storage commitment) {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
         return (terms, commitments[supplier][terms]);
     }
 
@@ -198,18 +198,18 @@ contract StateraPool {
         uint256 liquidity,
         uint256 shares
     ) external returns (uint256 loanId) {
-        require(sources.length > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(sources.length > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+        require(liquidity > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+        require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
-        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilExpiration() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuction() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
 
         uint256 sharesAvailable;
         unchecked {
             sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
         }
-        require(sharesAvailable >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+        require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked { loanId = totalLoans++; }
 
@@ -225,12 +225,12 @@ contract StateraPool {
         uint256 i = 0;
 
         while (liquidityRemaining > 0) {
-            require(i < sources.length, KernelError(KernelErrorType.INSUFFICIENT_LIQUIDITY));
+            require(i < sources.length, CoreError(CoreErrorType.INSUFFICIENT_LIQUIDITY));
 
             LendingTerms calldata source = sources[i];
 
             (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(source);
-            require(success, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+            require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
             Bucket storage bucket = buckets[terms];
 
@@ -263,7 +263,7 @@ contract StateraPool {
         }
 
         uint256 liquidityBorrowable = FixedPointMathLibrary.multiplyByUQ4x4(loan.sharesValue, loan.borrowFactor);
-        require(liquidityBorrowable >= loan.liquidityBorrowed, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL));
+        require(liquidityBorrowable >= loan.liquidityBorrowed, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL));
 
         unchecked {
             sharesAssigned[msg.sender] += shares;
@@ -273,7 +273,7 @@ contract StateraPool {
 
         require(
             asset.tryTransferFrom(msg.sender, address(this), liquidity),
-            KernelError(KernelErrorType.TRANSFER_FAILED)
+            CoreError(CoreErrorType.TRANSFER_FAILED)
         );
     }
 
@@ -283,11 +283,11 @@ contract StateraPool {
     /// - Reverts with an `TRANSFER_FAILED` error if repaying the assets back into the pool fails.
     /// @param loanId The identifier of the loan to repay.
     function repayLiquidity(uint256 loanId) external {
-        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilExpiration() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
 
         Loan storage loan = loans[loanId];
 
-        require(loan.active, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(loan.active, CoreError(CoreErrorType.ILLEGAL_STATE));
         loan.active = false;
 
         uint256 profitTotal;
@@ -339,7 +339,7 @@ contract StateraPool {
 
         require(
             asset.tryTransferFrom(msg.sender, address(this), loan.liquidityBorrowed + profitSuppliers),
-            KernelError(KernelErrorType.TRANSFER_FAILED)
+            CoreError(CoreErrorType.TRANSFER_FAILED)
         );
     }
 
@@ -350,7 +350,7 @@ contract StateraPool {
     /// @param shares The amount of shares to supply as collateral.
     /// @param recipient The address to supply collateral to.
     function supplyCollateral(uint256 shares, address recipient) external {
-        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
         totalSharesSupplied += shares;
         unchecked {
@@ -359,7 +359,7 @@ contract StateraPool {
 
         require(
             vault.tryTransferFrom(msg.sender, address(this), shares),
-            KernelError(KernelErrorType.TRANSFER_FAILED)
+            CoreError(CoreErrorType.TRANSFER_FAILED)
         );
 
         emit SupplyCollateral(msg.sender, shares, recipient);
@@ -382,9 +382,9 @@ contract StateraPool {
         uint256 liquidity,
         address recipient
     ) external {
-        require(liquidity > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
-        require(getSecondsUntilExpiration() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
-        require(getSecondsUntilAuction() > 0, KernelError(KernelErrorType.ILLEGAL_STATE));
+        require(liquidity > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+        require(getSecondsUntilExpiration() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuction() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
 
         (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
 
@@ -407,7 +407,7 @@ contract StateraPool {
 
         require(
             asset.tryTransferFrom(msg.sender, address(this), liquidity),
-            KernelError(KernelErrorType.TRANSFER_FAILED)
+            CoreError(CoreErrorType.TRANSFER_FAILED)
         );
 
         emit SupplyLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
@@ -420,20 +420,20 @@ contract StateraPool {
     /// @param shares The amount of shares to withdraw.
     /// @param recipient The address to withdraw collateral to.
     function withdrawCollateral(uint256 shares, address recipient) external {
-        require(shares > 0, KernelError(KernelErrorType.ILLEGAL_ARGUMENT));
+        require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
         uint256 sharesAvailable;
         unchecked {
             sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
         }
-        require(sharesAvailable >= shares, KernelError(KernelErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+        require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked {
             sharesSupplied[msg.sender] -= shares;
             totalSharesSupplied -= shares;
         }
 
-        require(vault.tryTransfer(recipient, shares), KernelError(KernelErrorType.TRANSFER_FAILED));
+        require(vault.tryTransfer(recipient, shares), CoreError(CoreErrorType.TRANSFER_FAILED));
 
         emit WithdrawCollateral(msg.sender, shares, recipient);
     }
