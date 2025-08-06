@@ -372,6 +372,9 @@ contract StateraPool {
         emit SupplyCollateral(msg.sender, shares, recipient);
     }
 
+    /// @custom:todo
+    function stageLiquidity(uint256 liquidity, address recipient) external { }
+
     /// @notice Withdraws collateral from this pool.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
@@ -396,6 +399,9 @@ contract StateraPool {
 
         emit WithdrawCollateral(msg.sender, shares, recipient);
     }
+
+    /// @custom:todo
+    function withdrawLiquidity(uint256 liquidity, address recipient) external { }
 
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied after the auction has started or when the pool has expired.
