@@ -18,7 +18,7 @@ import {
     CoreError,
     CoreErrorType,
     LendingTermsPacked,
-UQ4x4
+    UQ4x4
 } from "../src/types/Types.sol";
 
 contract LibraPoolTest is Test {
