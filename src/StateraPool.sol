@@ -405,7 +405,12 @@ contract StateraPool {
         emit WithdrawCollateral(msg.sender, shares, recipient);
     }
 
-    /// @custom:todo
+    /// @notice Withdraws liquidity to `recipient`.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// - Reverts with an `TRANSFER_FAILED` error if transferring the liquidity to `recipient` fails.
+    /// @param liquidity TODO
+    /// @param recipient TODO
     function withdrawLiquidity(uint256 liquidity, address recipient) external { }
 
     /// @notice Supplies liquidity to this pool.
