@@ -350,13 +350,13 @@ contract StateraPool {
         );
     }
 
-    /// @notice Supplies collateral to this pool.
+    /// @notice Stages shares to `recipient` to be used for borrowing.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
     /// - Reverts with an `TRANSFER_FAILED` error if transferring the shares to this pool fails.
-    /// @param shares The amount of shares to supply as collateral.
-    /// @param recipient The address to supply collateral to.
-    function supplyCollateral(uint256 shares, address recipient) external {
+    /// @param shares The amount of shares to stage.
+    /// @param recipient The address to stage collateral to.
+    function stageCollateral(uint256 shares, address recipient) external {
         require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
         totalSharesSupplied += shares;
