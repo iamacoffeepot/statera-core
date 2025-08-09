@@ -372,7 +372,12 @@ contract StateraPool {
         emit SupplyCollateral(msg.sender, shares, recipient);
     }
 
-    /// @custom:todo
+    /// @notice Stages liquidity to `recipient` to be used for lending.
+    /// @notice
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
+    /// - Reverts with an `TRANSFER_FAILED` error if transferring the liquidity to this pool fails.
+    /// @param liquidity The amount of liquidity to stage.
+    /// @param recipient The address to stage liquidity to.
     function stageLiquidity(uint256 liquidity, address recipient) external { }
 
     /// @notice Withdraws collateral from this pool.
