@@ -28,6 +28,15 @@ contract StateraPool {
     using TokenTransferLibrary for Token;
     using TokenTransferLibrary for TokenizedVault;
 
+    // @custom:todo Are parameters properly indexed?
+    event CommitLiquidity(
+        address indexed sender,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor,
+        uint256 liquidity,
+        address indexed recipient
+    );
+
     /// @custom:todo Are parameters properly indexed?
     event StageLiquidity(
         address indexed sender,
@@ -95,6 +104,9 @@ contract StateraPool {
 
     /// @custom:todo
     mapping(address supplier => uint256 liquidity) public liquidityCommitted;
+
+    /// @custom:todo
+    uint256 public liquidityCommittedTotal;
 
     /// @custom:todo
     mapping(address supplier => uint256 liquidity) public liquidityStaged;
@@ -304,8 +316,40 @@ contract StateraPool {
     function commitLiquidity(
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
-        uint256 liquidity
-    ) external { }
+        uint256 liquidity,
+        address recipient
+    ) external {
+        require(liquidity > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+        require(getSecondsUntilExpiration() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
+        require(getSecondsUntilAuction() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
+        require(liquidityStaged[msg.sender] >= liquidity, CoreError(CoreErrorType.INSUFFICIENT_LIQUIDITY));
+
+        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
+
+        Commitment storage commit = commitments[recipient][terms];
+
+        liquidityCommittedTotal += liquidity;
+        unchecked {
+            bucket.liquiditySupplied += liquidity;
+            commit.liquiditySupplied += liquidity;
+        }
+
+        uint256 liquidityWeighted = getLiquidityWeighted(liquidity);
+
+        bucket.liquidityWeighted += liquidityWeighted;
+        unchecked {
+            commit.liquidityWeighted += liquidityWeighted;
+        }
+
+        unchecked {
+            liquidityStaged[msg.sender] -= liquidity;
+            liquidityStagedTotal -= liquidity;
+        }
+
+        supplierBucketBitmap[recipient] |= 1 << terms.unwrap();
+
+        emit CommitLiquidity(msg.sender, borrowFactor, profitFactor, liquidity, recipient);
+    }
 
     /// @notice Repays liquidity to this pool.
     /// @notice
