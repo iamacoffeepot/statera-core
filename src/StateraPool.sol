@@ -97,10 +97,10 @@ contract StateraPool {
     mapping(address supplier => uint256 liquidity) public liquidityCommitted;
 
     /// @custom:todo
-    uint256 public liquidityStagedTotal;
+    mapping(address supplier => uint256 liquidity) public liquidityStaged;
 
     /// @custom:todo
-    mapping(address supplier => uint256 liquidity) public liquidityStaged;
+    uint256 public liquidityStagedTotal;
 
     /// @custom:todo
     mapping(uint256 id => Loan) public loans;
