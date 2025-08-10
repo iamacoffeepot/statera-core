@@ -58,6 +58,13 @@ contract StateraPool {
         address indexed recipient
     );
 
+    /// @custom:todo Are parameters properly indexed?
+    event WithdrawLiquidity(
+        address indexed sender,
+        uint256 liquidity,
+        address indexed recipient
+    );
+
     /// @notice The underlying token that `vault` uses for accounting, depositing, and withdrawing.
     Token immutable public asset;
 
@@ -89,6 +96,9 @@ contract StateraPool {
 
     /// @custom:todo
     mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
+
+    /// @custom:todo
+    mapping(address supplier => uint256 liquidity) public liquidityCommitted;
 
     /// @custom:todo
     uint256 public liquidityStagedTotal;
@@ -438,7 +448,27 @@ contract StateraPool {
     /// - Reverts with an `TRANSFER_FAILED` error if transferring the liquidity to `recipient` fails.
     /// @param liquidity The amount of liquidity to withdraw.
     /// @param recipient The address to withdraw liquidity to.
-    function withdrawLiquidity(uint256 liquidity, address recipient) external { }
+    function withdrawLiquidity(uint256 liquidity, address recipient) external {
+        require(liquidity > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+
+        uint256 liquidityAvailable;
+        unchecked {
+            liquidityAvailable = liquidityStaged[msg.sender] - liquidityCommitted[msg.sender];
+        }
+        require(liquidityAvailable >= liquidity, CoreError(CoreErrorType.INSUFFICIENT_LIQUIDITY)); // TODO
+
+        unchecked {
+            liquidityStaged[msg.sender] -= liquidity;
+            liquidityStagedTotal -= liquidity;
+        }
+
+        require(
+            asset.tryTransfer(recipient, liquidity),
+            CoreError(CoreErrorType.TRANSFER_FAILED)
+        );
+
+        emit WithdrawLiquidity(msg.sender, liquidity, recipient);
+    }
 
     /// @notice Supplies liquidity to this pool.
     /// @notice Liquidity cannot be supplied after the auction has started or when the pool has expired.
