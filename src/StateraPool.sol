@@ -103,9 +103,6 @@ contract StateraPool {
     mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
 
     /// @custom:todo
-    mapping(address supplier => uint256 liquidity) public liquidityCommitted;
-
-    /// @custom:todo
     uint256 public liquidityCommittedTotal;
 
     /// @custom:todo
@@ -494,12 +491,7 @@ contract StateraPool {
     /// @param recipient The address to withdraw liquidity to.
     function withdrawLiquidity(uint256 liquidity, address recipient) external {
         require(liquidity > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
-
-        uint256 liquidityAvailable;
-        unchecked {
-            liquidityAvailable = liquidityStaged[msg.sender] - liquidityCommitted[msg.sender];
-        }
-        require(liquidityAvailable >= liquidity, CoreError(CoreErrorType.INSUFFICIENT_LIQUIDITY)); // TODO
+        require(liquidityStaged[msg.sender] >= liquidity, CoreError(CoreErrorType.INSUFFICIENT_LIQUIDITY));
 
         unchecked {
             liquidityStaged[msg.sender] -= liquidity;
