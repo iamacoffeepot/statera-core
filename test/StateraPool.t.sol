@@ -39,7 +39,7 @@ contract LibraPoolTest is Test {
         vm.stopPrank();
     }
 
-    modifier validatesSupplyLiquidityArguments(
+    modifier validatesCommitLiquidityArguments(
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
         uint256 liquidity
@@ -73,12 +73,13 @@ contract LibraPoolTest is Test {
         uint256 liquidity,
         address recipient
     ) external
-        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        validatesCommitLiquidityArguments(borrowFactor, profitFactor, liquidity)
         mintsAssetsTo(caller, liquidity)
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.stageLiquidity(liquidity, address(caller));
+        pool.commitLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
         (
             /* uint256 liquidityBorrowed */,
@@ -90,19 +91,20 @@ contract LibraPoolTest is Test {
         assertEq(liquiditySupplied, liquidity);
     }
 
-    function test_fuzz_supply_liquidity_increases_supplied_of_recipient(
+    function test_fuzz_commit_liquidity_increases_supplied_of_recipient(
         address caller,
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
-        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        validatesCommitLiquidityArguments(borrowFactor, profitFactor, liquidity)
         mintsAssetsTo(caller, liquidity)
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.stageLiquidity(liquidity, address(caller));
+        pool.commitLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
         (
             uint256 liquiditySupplied,
@@ -112,52 +114,55 @@ contract LibraPoolTest is Test {
         assertEq(liquiditySupplied, liquidity);
     }
 
-    function test_fuzz_supply_liquidity_increases_total_liquidity_supplied(
+    function test_fuzz_commit_liquidity_increases_total_liquidity_supplied(
         address caller,
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
-        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        validatesCommitLiquidityArguments(borrowFactor, profitFactor, liquidity)
         mintsAssetsTo(caller, liquidity)
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
-        assertEq(pool.totalLiquiditySupplied(), liquidity);
+        pool.stageLiquidity(liquidity, address(caller));
+        pool.commitLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        assertEq(pool.liquidityCommittedTotal(), liquidity);
     }
 
-    function test_fuzz_supply_liquidity_transfers_assets_from_caller(
+    function test_fuzz_commit_liquidity_transfers_assets_from_caller(
         address caller,
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
-        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        validatesCommitLiquidityArguments(borrowFactor, profitFactor, liquidity)
         mintsAssetsTo(caller, liquidity)
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.stageLiquidity(liquidity, address(caller));
+        pool.commitLiquidity(borrowFactor, profitFactor, liquidity, recipient);
         assertEq(asset.balanceOf(address(pool)), liquidity);
         assertEq(asset.balanceOf(address(caller)), 0);
     }
 
-    function test_fuzz_supply_liquidity_updates_recipient_bucket_bitmap(
+    function test_fuzz_commit_liquidity_updates_recipient_bucket_bitmap(
         address caller,
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
         uint256 liquidity,
         address recipient
     ) external
-        validatesSupplyLiquidityArguments(borrowFactor, profitFactor, liquidity)
+        validatesCommitLiquidityArguments(borrowFactor, profitFactor, liquidity)
         mintsAssetsTo(caller, liquidity)
         performsCallsAs(caller)
     {
         assertTrue(asset.approve(address(pool), liquidity));
-        pool.DEPRECATED_supplyLiquidity(borrowFactor, profitFactor, liquidity, recipient);
+        pool.stageLiquidity(liquidity, address(caller));
+        pool.commitLiquidity(borrowFactor, profitFactor, liquidity, recipient);
 
         LendingTermsPacked terms = LendingTermsLibrary.unsafePack(borrowFactor, profitFactor);
         assertEq(pool.supplierBucketBitmap(recipient), 1 << terms.unwrap());
