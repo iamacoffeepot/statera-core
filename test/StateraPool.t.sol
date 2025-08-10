@@ -177,9 +177,12 @@ contract LibraPoolTest is Test {
         assertEq(pool.getSecondsUntilExpiration(0), pool.timeExpires());
     }
 
-    function test_supply_liquidity_reverts_when_borrow_factor_is_invalid() external {
+    function test_supply_liquidity_reverts_when_borrow_factor_is_invalid()  external mintsAssetsTo(address(this), 1) {
+        assertTrue(asset.approve(address(pool), 1));
+        pool.stageLiquidity(1, address(this));
+
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_ARGUMENT)));
-        pool.DEPRECATED_supplyLiquidity(
+        pool.commitLiquidity(
             UQ4x4.wrap(type(uint8).max),
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             1,
@@ -187,9 +190,12 @@ contract LibraPoolTest is Test {
         );
     }
 
-    function test_supply_liquidity_reverts_when_liquidity_is_zero() external {
+    function test_supply_liquidity_reverts_when_liquidity_is_zero()  external mintsAssetsTo(address(this), 1) {
+        assertTrue(asset.approve(address(pool), 1));
+        pool.stageLiquidity(1, address(this));
+
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_ARGUMENT)));
-        pool.DEPRECATED_supplyLiquidity(
+        pool.commitLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             0,
@@ -197,9 +203,12 @@ contract LibraPoolTest is Test {
         );
     }
 
-    function test_supply_liquidity_reverts_when_profit_factor_is_invalid() external {
+    function test_supply_liquidity_reverts_when_profit_factor_is_invalid() external mintsAssetsTo(address(this), 1) {
+        assertTrue(asset.approve(address(pool), 1));
+        pool.stageLiquidity(1, address(this));
+
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_ARGUMENT)));
-        pool.DEPRECATED_supplyLiquidity(
+        pool.commitLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             UQ4x4.wrap(type(uint8).max),
             1,
@@ -207,10 +216,13 @@ contract LibraPoolTest is Test {
         );
     }
 
-    function test_supply_liquidity_reverts_when_auction_active() external {
+    function test_commit_liquidity_reverts_when_auction_active() external mintsAssetsTo(address(this), 1) {
+        assertTrue(asset.approve(address(pool), 1));
+        pool.stageLiquidity(1, address(this));
+
         vm.warp(pool.timeAuction());
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_STATE)));
-        pool.DEPRECATED_supplyLiquidity(
+        pool.commitLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
             1,
@@ -218,10 +230,13 @@ contract LibraPoolTest is Test {
         );
     }
 
-    function test_supply_liquidity_reverts_when_pool_expired() external {
+    function test_commit_liquidity_reverts_when_pool_expired() external mintsAssetsTo(address(this), 1) {
+        assertTrue(asset.approve(address(pool), 1));
+        pool.stageLiquidity(1, address(this));
+
         vm.warp(pool.timeExpires());
         vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_STATE)));
-        pool.DEPRECATED_supplyLiquidity(
+        pool.commitLiquidity(
             LendingTermsLibrary.BORROW_FACTOR_MINIMUM,
             LendingTermsLibrary.PROFIT_FACTOR_MINIMUM,
             1,
