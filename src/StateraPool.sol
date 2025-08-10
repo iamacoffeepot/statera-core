@@ -29,6 +29,13 @@ contract StateraPool {
     using TokenTransferLibrary for TokenizedVault;
 
     /// @custom:todo Are parameters properly indexed?
+    event StageLiquidity(
+        address indexed sender,
+        uint256 liquidity,
+        address indexed recipient
+    );
+
+    /// @custom:todo Are parameters properly indexed?
     event SupplyCollateral(
         address indexed sender,
         uint256 shares,
@@ -82,6 +89,12 @@ contract StateraPool {
 
     /// @custom:todo
     mapping(address supplier => mapping(LendingTermsPacked => Commitment)) public commitments;
+
+    /// @custom:todo
+    uint256 public liquidityStagedTotal;
+
+    /// @custom:todo
+    mapping(address supplier => uint256 liquidity) public liquidityStaged;
 
     /// @custom:todo
     mapping(uint256 id => Loan) public loans;
@@ -378,7 +391,21 @@ contract StateraPool {
     /// - Reverts with an `TRANSFER_FAILED` error if transferring the liquidity to this pool fails.
     /// @param liquidity The amount of liquidity to stage.
     /// @param recipient The address to stage liquidity to.
-    function stageLiquidity(uint256 liquidity, address recipient) external { }
+    function stageLiquidity(uint256 liquidity, address recipient) external {
+        require(liquidity > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+
+        liquidityStagedTotal += liquidity;
+        unchecked {
+            liquidityStaged[recipient] += liquidity;
+        }
+
+        require(
+            asset.tryTransferFrom(msg.sender, address(this), liquidity),
+            CoreError(CoreErrorType.TRANSFER_FAILED)
+        );
+
+        emit StageLiquidity(msg.sender, liquidity, recipient);
+    }
 
     /// @notice Withdraws collateral from this pool.
     /// @notice
