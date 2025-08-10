@@ -36,7 +36,7 @@ contract StateraPool {
     );
 
     /// @custom:todo Are parameters properly indexed?
-    event SupplyCollateral(
+    event StageCollateral(
         address indexed sender,
         uint256 shares,
         address indexed recipient
@@ -88,10 +88,6 @@ contract StateraPool {
     uint256 public totalLoans;
 
     /// @custom:todo
-    /// @custom:invariant `totalSharesSupplied >= sum(sharesSupplied)`
-    uint256 public totalSharesSupplied;
-
-    /// @custom:todo
     mapping(LendingTermsPacked => Bucket) public buckets;
 
     /// @custom:todo
@@ -113,8 +109,12 @@ contract StateraPool {
     mapping(uint256 id => mapping(LendingTermsPacked => uint256 liquidity)) public loanChunks;
 
     /// @custom:todo
-    /// @custom:invariant `∀x(sharesSupplied[x] > sharesUtilized[x])`
-    mapping(address => uint256 shares) public sharesSupplied;
+    /// @custom:invariant `∀x(sharesStaged[x] > sharesUtilized[x])`
+    mapping(address => uint256 shares) public sharesStaged;
+
+    /// @custom:todo
+    /// @custom:invariant `sharesStagedTotal >= sum(sharesStaged)`
+    uint256 public sharesStagedTotal;
 
     /// @custom:todo
     mapping(address => uint256 shares) public sharesAssigned;
@@ -230,7 +230,7 @@ contract StateraPool {
 
         uint256 sharesAvailable;
         unchecked {
-            sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+            sharesAvailable = sharesStaged[msg.sender] - sharesAssigned[msg.sender];
         }
         require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
@@ -382,9 +382,9 @@ contract StateraPool {
     function stageCollateral(uint256 shares, address recipient) external {
         require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
-        totalSharesSupplied += shares;
+        sharesStagedTotal += shares;
         unchecked {
-            sharesSupplied[recipient] += shares;
+            sharesStaged[recipient] += shares;
         }
 
         require(
@@ -392,7 +392,7 @@ contract StateraPool {
             CoreError(CoreErrorType.TRANSFER_FAILED)
         );
 
-        emit SupplyCollateral(msg.sender, shares, recipient);
+        emit StageCollateral(msg.sender, shares, recipient);
     }
 
     /// @notice Stages liquidity to `recipient` to be used for lending.
@@ -428,13 +428,13 @@ contract StateraPool {
 
         uint256 sharesAvailable;
         unchecked {
-            sharesAvailable = sharesSupplied[msg.sender] - sharesAssigned[msg.sender];
+            sharesAvailable = sharesStaged[msg.sender] - sharesAssigned[msg.sender];
         }
         require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked {
-            sharesSupplied[msg.sender] -= shares;
-            totalSharesSupplied -= shares;
+            sharesStaged[msg.sender] -= shares;
+            sharesStagedTotal -= shares;
         }
 
         require(vault.tryTransfer(recipient, shares), CoreError(CoreErrorType.TRANSFER_FAILED));
