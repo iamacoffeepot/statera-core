@@ -436,8 +436,8 @@ contract StateraPool {
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `liquidity` is equal to zero.
     /// - Reverts with an `TRANSFER_FAILED` error if transferring the liquidity to `recipient` fails.
-    /// @param liquidity TODO
-    /// @param recipient TODO
+    /// @param liquidity The amount of liquidity to withdraw.
+    /// @param recipient The address to withdraw liquidity to.
     function withdrawLiquidity(uint256 liquidity, address recipient) external { }
 
     /// @notice Supplies liquidity to this pool.
