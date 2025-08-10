@@ -66,7 +66,7 @@ contract LibraPoolTest is Test {
         pool = poolFactory.createPool(vault);
     }
 
-    function test_fuzz_supply_liquidity_increases_supplied_of_bucket(
+    function test_fuzz_commit_liquidity_increases_supplied_of_bucket(
         address caller,
         UQ4x4 borrowFactor,
         UQ4x4 profitFactor,
@@ -182,7 +182,7 @@ contract LibraPoolTest is Test {
         assertEq(pool.getSecondsUntilExpiration(0), pool.timeExpires());
     }
 
-    function test_supply_liquidity_reverts_when_borrow_factor_is_invalid()  external mintsAssetsTo(address(this), 1) {
+    function test_commit_liquidity_reverts_when_borrow_factor_is_invalid()  external mintsAssetsTo(address(this), 1) {
         assertTrue(asset.approve(address(pool), 1));
         pool.stageLiquidity(1, address(this));
 
@@ -195,7 +195,7 @@ contract LibraPoolTest is Test {
         );
     }
 
-    function test_supply_liquidity_reverts_when_liquidity_is_zero()  external mintsAssetsTo(address(this), 1) {
+    function test_commit_liquidity_reverts_when_liquidity_is_zero()  external mintsAssetsTo(address(this), 1) {
         assertTrue(asset.approve(address(pool), 1));
         pool.stageLiquidity(1, address(this));
 
@@ -208,7 +208,7 @@ contract LibraPoolTest is Test {
         );
     }
 
-    function test_supply_liquidity_reverts_when_profit_factor_is_invalid() external mintsAssetsTo(address(this), 1) {
+    function test_commit_liquidity_reverts_when_profit_factor_is_invalid() external mintsAssetsTo(address(this), 1) {
         assertTrue(asset.approve(address(pool), 1));
         pool.stageLiquidity(1, address(this));
 
