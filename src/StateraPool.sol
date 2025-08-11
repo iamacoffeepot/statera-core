@@ -414,6 +414,9 @@ contract StateraPool {
         );
     }
 
+    /// @custom:todo
+    function settleCommitment(UQ4x4 borrowFactor, UQ4x4 profitFactor) external { }
+
     /// @notice Stages shares to `recipient` to be used for borrowing.
     /// @notice
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `shares` is equal to zero.
