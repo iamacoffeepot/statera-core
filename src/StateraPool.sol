@@ -406,6 +406,7 @@ contract StateraPool {
     /// @notice
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has not started.
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `borrowFactor` or `profitFactor` are invalid.
+    /// - Reverts with an `ILLEGAL_STATE` error if the commitment is empty.
     /// - Reverts with an `ILLEGAL_STATE` error if the associated bucket is unsettled.
     function settleCommitment(UQ4x4 borrowFactor, UQ4x4 profitFactor) external {
         require(getSecondsUntilAuction() == 0, CoreError(CoreErrorType.ILLEGAL_STATE));
@@ -413,13 +414,14 @@ contract StateraPool {
         (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
         require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
 
+        Commitment storage commit = commitments[msg.sender][terms];
+        require(commit.liquiditySupplied > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
+
         Bucket storage bucket = buckets[terms];
 
         // Check that the bucket is settled. When the pool expires all loans are closed.
         uint256 loanCount = getSecondsUntilExpiration() > 0 ? bucket.loanCount : 0;
         require(loanCount == 0, CoreError(CoreErrorType.ILLEGAL_STATE));
-
-        Commitment storage commit = commitments[msg.sender][terms];
 
         uint256 liquidityAvailable;
         unchecked {
