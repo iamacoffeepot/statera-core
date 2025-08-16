@@ -439,6 +439,8 @@ contract StateraPool {
         // TODO: Use calculated value or actual value
         liquidityCommittedTotal -= liquidity;
 
+        delete commitments[msg.sender][terms];
+
         liquidityStagedTotal += liquidity + profits;
         unchecked {
             liquidityStaged[msg.sender] += liquidity + profits;
