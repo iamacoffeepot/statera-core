@@ -38,6 +38,13 @@ contract StateraPool {
     );
 
     /// @custom:todo Are parameters properly indexed?
+    event SettleCommitment(
+        address indexed sender,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor
+    );
+
+    /// @custom:todo Are parameters properly indexed?
     event StageLiquidity(
         address indexed sender,
         uint256 liquidity,
@@ -392,7 +399,7 @@ contract StateraPool {
                     UQ4X4_ONE - profitFactor
                 );
 
-                buckets[terms].supplierProfitsRealized += profitBucket;
+                buckets[terms].profitsRealized += profitBucket;
 
                 unchecked {
                     profitSuppliers += profitBucket;
@@ -415,7 +422,46 @@ contract StateraPool {
     }
 
     /// @custom:todo
-    function settleCommitment(UQ4x4 borrowFactor, UQ4x4 profitFactor) external { }
+    /// @notice
+    /// - Reverts with an `ILLEGAL_STATE` error if the auction has not started.
+    /// - Reverts with an `ILLEGAL_ARGUMENT` error if `borrowFactor` or `profitFactor` are invalid.
+    /// - Reverts with an `ILLEGAL_STATE` error if the associated bucket is unsettled.
+    function settleCommitment(UQ4x4 borrowFactor, UQ4x4 profitFactor) external {
+        require(getSecondsUntilAuction() == 0, CoreError(CoreErrorType.ILLEGAL_STATE));
+
+        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
+        require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+
+        Bucket storage bucket = buckets[terms];
+
+        // Check that the bucket is settled. When the pool expires all loans are closed.
+        uint256 loanCount = getSecondsUntilExpiration() > 0 ? bucket.loanCount : 0;
+        require(loanCount == 0, CoreError(CoreErrorType.ILLEGAL_STATE));
+
+        Commitment storage commit = commitments[msg.sender][terms];
+
+        uint256 liquidityAvailable;
+        unchecked {
+            liquidityAvailable = bucket.liquiditySupplied - bucket.liquidityBorrowed;
+        }
+
+        uint256 liquidity = MathLibrary.mulDiv(liquidityAvailable,commit.liquiditySupplied,bucket.liquiditySupplied);
+        unchecked {
+            bucket.liquiditySupplied -= liquidity;
+        }
+
+        uint256 profits = MathLibrary.mulDiv(bucket.profitsRealized,commit.liquidityWeighted,bucket.liquidityWeighted);
+        unchecked {
+            bucket.profitsRealized -= profits;
+        }
+
+        liquidityStagedTotal += (liquidity += profits);
+        unchecked {
+            liquidityStaged[msg.sender] += liquidity;
+        }
+
+        emit SettleCommitment(msg.sender, borrowFactor, profitFactor);
+    }
 
     /// @notice Stages shares to `recipient` to be used for borrowing.
     /// @notice
