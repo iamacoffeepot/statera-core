@@ -210,6 +210,7 @@ contract StateraPool {
     /// @param liquidity The amount of liquidity to borrow.
     /// @param shares The amount of shares to supply as collateral.
     /// @return loanId The identifier of the created loan.
+    /// @custom:todo Assure that you cannot take liquidity from bucket more than once to prevent invalid loan count
     function borrowLiquidity(
         LendingTerms[] calldata sources,
         uint256 liquidity,
@@ -263,6 +264,7 @@ contract StateraPool {
             uint256 liquidityBorrowed = MathLibrary.min(liquidityAvailable, liquidityRemaining);
             unchecked {
                 bucket.liquidityBorrowed += liquidityBorrowed;
+                bucket.loanCount++;
             }
 
             loanChunks[loanId][terms] = liquidityBorrowed;
@@ -381,6 +383,7 @@ contract StateraPool {
                 );
 
                 buckets[terms].profitsRealized += profitBucket;
+                buckets[terms].loanCount--;
 
                 unchecked {
                     profitSuppliers += profitBucket;
