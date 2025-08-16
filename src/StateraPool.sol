@@ -146,28 +146,6 @@ contract StateraPool {
         require(timeExpires > timeAuction, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
     }
 
-    /// @notice Returns a storage pointer to the bucket associated with the given lending terms
-    /// (`borrowFactor` and `profitFactor`).
-    function getBucketPointer(
-        UQ4x4 borrowFactor,
-        UQ4x4 profitFactor
-    ) internal view returns (LendingTermsPacked terms, Bucket storage bucket) {
-        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
-        return (terms, buckets[terms]);
-    }
-
-    /// @custom:todo
-    function getCommitmentPointer(
-        address supplier,
-        UQ4x4 borrowFactor,
-        UQ4x4 profitFactor
-    ) internal view returns (LendingTermsPacked terms, Commitment storage commitment) {
-        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
-        require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
-        return (terms, commitments[supplier][terms]);
-    }
-
     /// @notice Returns the proportion of collateral that can be claimed from a borrower when closing a loan during
     /// the auction period respective to `timestamp`.
     function getLiquidationFactor(uint256 timestamp) public view returns (uint256 result) { }
@@ -328,7 +306,10 @@ contract StateraPool {
         require(getSecondsUntilAuction() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
         require(liquidityStaged[msg.sender] >= liquidity, CoreError(CoreErrorType.INSUFFICIENT_LIQUIDITY));
 
-        (LendingTermsPacked terms, Bucket storage bucket) = getBucketPointer(borrowFactor, profitFactor);
+        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
+        require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+
+        Bucket storage bucket = buckets[terms];
 
         Commitment storage commit = commitments[recipient][terms];
 
