@@ -436,6 +436,9 @@ contract StateraPool {
             bucket.profitsRealized -= profits;
         }
 
+        // TODO: Use calculated value or actual value
+        liquidityCommittedTotal -= liquidity;
+
         liquidityStagedTotal += liquidity + profits;
         unchecked {
             liquidityStaged[msg.sender] += liquidity + profits;
