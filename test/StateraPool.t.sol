@@ -56,6 +56,11 @@ contract LibraPoolTest is Test {
         _;
     }
 
+    modifier validatesStageLiquidityArguments(uint256 liquidity) {
+        vm.assume(liquidity > 0);
+        _;
+    }
+
     function setUp() external {
         vault = new MockTokenizedVault(asset = new MockToken());
 
@@ -168,6 +173,36 @@ contract LibraPoolTest is Test {
         LendingTermsPacked terms = LendingTermsLibrary.unsafePack(borrowFactor, profitFactor);
         assertEq(pool.supplierBucketBitmap(recipient), 1 << terms.unwrap());
     }
+
+    function test_fuzz_stage_liquidity_increases_liquidity_staged_of_recipient(
+        address caller,
+        uint256 liquidity,
+        address recipient
+    ) external
+        validatesStageLiquidityArguments(liquidity)
+        mintsAssetsTo(caller, liquidity)
+        performsCallsAs(caller)
+    {
+        assertTrue(asset.approve(address(pool), liquidity));
+        pool.stageLiquidity(liquidity, address(recipient));
+
+        assertEq(pool.liquidityStaged(recipient), liquidity);
+    }
+
+    function test_fuzz_stage_liquidity_increases_liquidity_staged_total(
+        address caller,
+        uint256 liquidity,
+        address recipient
+    ) external
+        validatesStageLiquidityArguments(liquidity)
+        mintsAssetsTo(caller, liquidity)
+        performsCallsAs(caller)
+    {
+        assertTrue(asset.approve(address(pool), liquidity));
+        pool.stageLiquidity(liquidity, address(recipient));
+
+        assertEq(pool.liquidityStagedTotal(), liquidity);
+    }
     
     function test_get_seconds_until_auction() external {
         assertEq(pool.getSecondsUntilAuction(pool.timeAuction()), 0);
@@ -248,5 +283,12 @@ contract LibraPoolTest is Test {
             1,
             address(0xdead)
         );
+    }
+
+    function test_stage_liquidity_reverts_when_liquidity_is_zero() external mintsAssetsTo(address(this), 1) {
+        assertTrue(asset.approve(address(pool), 1));
+
+        vm.expectRevert(abi.encodeWithSelector(CoreError.selector, (CoreErrorType.ILLEGAL_ARGUMENT)));
+        pool.stageLiquidity(0, address(this));
     }
 }
