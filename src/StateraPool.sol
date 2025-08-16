@@ -436,9 +436,9 @@ contract StateraPool {
             bucket.profitsRealized -= profits;
         }
 
-        liquidityStagedTotal += (liquidity += profits);
+        liquidityStagedTotal += liquidity + profits;
         unchecked {
-            liquidityStaged[msg.sender] += liquidity;
+            liquidityStaged[msg.sender] += liquidity + profits;
         }
 
         emit SettleCommitment(msg.sender, borrowFactor, profitFactor);
