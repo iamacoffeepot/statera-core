@@ -132,9 +132,6 @@ contract StateraPool {
     /// @custom:invariant `sharesStagedTotal >= sum(sharesStaged)`
     uint256 public sharesStagedTotal;
 
-    /// @custom:todo
-    mapping(address => uint256 shares) public sharesAssigned;
-
     /// @notice A bitmap for each address that specifies the buckets that they have supplied liquidity to.
     mapping(address supplier => uint256) public supplierBucketBitmap;
 
@@ -219,15 +216,10 @@ contract StateraPool {
         require(sources.length > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
         require(liquidity > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
         require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+        require(sharesStaged[msg.sender] >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         require(getSecondsUntilExpiration() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
         require(getSecondsUntilAuction() > 0, CoreError(CoreErrorType.ILLEGAL_STATE));
-
-        uint256 sharesAvailable;
-        unchecked {
-            sharesAvailable = sharesStaged[msg.sender] - sharesAssigned[msg.sender];
-        }
-        require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked { loanId = totalLoans++; }
 
@@ -285,7 +277,8 @@ contract StateraPool {
         require(liquidityBorrowable >= loan.liquidityBorrowed, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL));
 
         unchecked {
-            sharesAssigned[msg.sender] += shares;
+            sharesStaged[msg.sender] -= shares;
+            sharesStagedTotal -= shares;
         }
 
         loans[loanId] = loan;
@@ -393,10 +386,6 @@ contract StateraPool {
             // Prevent overflow when index is 255, equivalent to: buckets >>= index + 1;
             bitmap >>= position;
             bitmap >>= 1;
-        }
-
-        unchecked {
-            sharesAssigned[msg.sender] -= loan.sharesSupplied;
         }
 
         require(
@@ -516,12 +505,7 @@ contract StateraPool {
     /// @param recipient The address to withdraw collateral to.
     function withdrawCollateral(uint256 shares, address recipient) external {
         require(shares > 0, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
-
-        uint256 sharesAvailable;
-        unchecked {
-            sharesAvailable = sharesStaged[msg.sender] - sharesAssigned[msg.sender];
-        }
-        require(sharesAvailable >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
+        require(sharesStaged[msg.sender] >= shares, CoreError(CoreErrorType.INSUFFICIENT_COLLATERAL)); // TODO
 
         unchecked {
             sharesStaged[msg.sender] -= shares;
