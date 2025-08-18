@@ -441,12 +441,22 @@ contract StateraPool {
             bucket.profitsRealized -= profits;
         }
 
+        uint256 shares = MathLibrary.mulDiv(bucket.shares, commit.liquiditySupplied, bucket.liquiditySupplied);
+        unchecked {
+            bucket.shares -= shares;
+        }
+
         // TODO: Use calculated value or actual value
         liquidityCommittedTotal -= liquidity;
 
         liquidityStagedTotal += liquidity + profits;
         unchecked {
             liquidityStaged[msg.sender] += liquidity + profits;
+        }
+
+        sharesStagedTotal += shares;
+        unchecked {
+            sharesStaged[msg.sender] += shares;
         }
 
         delete commitments[msg.sender][terms];
