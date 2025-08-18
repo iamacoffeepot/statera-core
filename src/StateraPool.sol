@@ -436,7 +436,7 @@ contract StateraPool {
             bucket.liquiditySupplied -= liquidity;
         }
 
-        uint256 profits = MathLibrary.mulDiv(bucket.profitsRealized,commit.liquidityWeighted,bucket.liquidityWeighted);
+        uint256 profits = MathLibrary.mulDiv(bucket.profitsRealized, commit.liquidityWeighted, bucket.liquidityWeighted);
         unchecked {
             bucket.profitsRealized -= profits;
         }
