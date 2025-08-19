@@ -418,7 +418,20 @@ contract StateraPool {
         uint256 profits,
         uint256 shares
     ) {
+        Bucket storage bucket = buckets[terms];
 
+        uint256 liquidityAvailable;
+        unchecked {
+            liquidityAvailable = bucket.liquiditySupplied - bucket.liquidityBorrowed;
+        }
+
+        Commitment storage commit = commitments[supplier][terms];
+
+        return (
+            MathLibrary.mulDiv(liquidityAvailable, commit.liquiditySupplied, bucket.liquiditySupplied),
+            MathLibrary.mulDiv(bucket.profitsRealized, commit.liquidityWeighted, bucket.liquidityWeighted),
+            MathLibrary.mulDiv(bucket.shares, commit.liquiditySupplied, bucket.liquiditySupplied)
+        );
     }
 
     /// @custom:todo
