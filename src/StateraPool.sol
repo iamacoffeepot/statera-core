@@ -395,6 +395,33 @@ contract StateraPool {
     }
 
     /// @custom:todo
+    function previewSettleCommitment(
+        address supplier,
+        UQ4x4 borrowFactor,
+        UQ4x4 profitFactor
+    ) public view returns (
+        uint256 liquidity,
+        uint256 profits,
+        uint256 shares
+    ) {
+        (LendingTermsPacked terms, bool success) = LendingTermsLibrary.tryPack(borrowFactor, profitFactor);
+        require(success, CoreError(CoreErrorType.ILLEGAL_ARGUMENT));
+        return previewSettleCommitment(supplier, terms);
+    }
+
+    /// @custom:todo
+    function previewSettleCommitment(
+        address supplier,
+        LendingTermsPacked terms
+    ) internal view returns (
+        uint256 liquidity,
+        uint256 profits,
+        uint256 shares
+    ) {
+
+    }
+
+    /// @custom:todo
     /// @notice
     /// - Reverts with an `ILLEGAL_STATE` error if the auction has not started.
     /// - Reverts with an `ILLEGAL_ARGUMENT` error if `borrowFactor` or `profitFactor` are invalid.
