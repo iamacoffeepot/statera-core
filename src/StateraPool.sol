@@ -455,23 +455,11 @@ contract StateraPool {
         uint256 loanCount = getSecondsUntilExpiration() > 0 ? bucket.loanCount : 0;
         require(loanCount == 0, CoreError(CoreErrorType.ILLEGAL_STATE));
 
-        uint256 liquidityAvailable;
-        unchecked {
-            liquidityAvailable = bucket.liquiditySupplied - bucket.liquidityBorrowed;
-        }
+        (uint256 liquidity, uint256 profits, uint256 shares) = previewSettleCommitment(msg.sender, terms);
 
-        uint256 liquidity = MathLibrary.mulDiv(liquidityAvailable,commit.liquiditySupplied,bucket.liquiditySupplied);
         unchecked {
             bucket.liquiditySupplied -= liquidity;
-        }
-
-        uint256 profits = MathLibrary.mulDiv(bucket.profitsRealized, commit.liquidityWeighted, bucket.liquidityWeighted);
-        unchecked {
             bucket.profitsRealized -= profits;
-        }
-
-        uint256 shares = MathLibrary.mulDiv(bucket.shares, commit.liquiditySupplied, bucket.liquiditySupplied);
-        unchecked {
             bucket.shares -= shares;
         }
 
