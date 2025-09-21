@@ -1,9 +1,5 @@
 # statera-core
 
-## Authors
-
-- [Ov3rKoalified](https://x.com/Ov3rKoalafied) - For our many conversations about the game theory of various mechanics and how to make the protocol applicable to the general public
-
 ## Overview
 
 Statera is a decentralized finance protocol that provides users a means to originate fixed-term over-collateralized loans with yield bearing assets. Instead of charging interest during the life of a loan, Statera takes profits  when the loan is closed and distributes them at a prearranged proportion to the borrower and lenders.
@@ -52,4 +48,9 @@ A Profit Factor is internally represented as a `UQ4x4` (an unsigned 8-bit  fixed
 A pool is considered active when it is deployed. A pool is active until the current block timestamp exceeds the expiration time.
 
 When a Pool becomes inactive, all active loans are considered insolvent. The collateral of insolvent loans is seized from borrowers and distributed pro rata to lenders based upon how much liquidity they contributed to the loan.
+
+## Authors
+
+- [Ov3rKoalified](https://x.com/Ov3rKoalafied) - For our many conversations about the game theory of various mechanics and how to make the protocol applicable to the general public
+
 
