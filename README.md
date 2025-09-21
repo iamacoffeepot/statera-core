@@ -51,4 +51,4 @@ When a Pool becomes inactive, all active loans are considered insolvent. The col
 
 ### Authors
 
-- [Ov3rKoalified](https://x.com/Ov3rKoalafied) For our many conversations about the game theory of various mechanics and how to make the protocol applicable to the general public
+- [Ov3rKoalified](https://x.com/Ov3rKoalafied) - For our many conversations about the game theory of various mechanics and how to make the protocol applicable to the general public
